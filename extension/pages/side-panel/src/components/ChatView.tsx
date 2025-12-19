@@ -378,7 +378,7 @@ export function ChatView({
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <Lightbulb size={14} weight="duotone" className="flex-shrink-0 text-[var(--accent-primary)]" />
-                  <span className="text-xs font-mono text-left line-clamp-2 leading-snug">
+                  <span className="text-xs font-mono text-left">
                     {followupQuestion}
                   </span>
                 </div>

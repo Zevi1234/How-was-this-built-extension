@@ -24,7 +24,7 @@ const steps = [
 
 export function HowItWorks() {
     return (
-        <section className="py-24 bg-white">
+        <section className="py-24 bg-background">
             <div className="container mx-auto px-4 relative z-20">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -32,8 +32,8 @@ export function HowItWorks() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl font-bold text-neutral-900 mb-4 tracking-tight">How it works</h2>
-                    <p className="text-lg text-neutral-500 max-w-xl mx-auto">Three steps. Zero friction.</p>
+                    <h2 className="text-4xl font-bold text-text-primary mb-4 tracking-tight">How it works</h2>
+                    <p className="text-lg text-text-secondary max-w-xl mx-auto">Three steps. Zero friction.</p>
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
@@ -47,18 +47,18 @@ export function HowItWorks() {
                             className="text-center"
                         >
                             {/* Number */}
-                            <div className="font-mono text-5xl font-bold text-neutral-200 mb-4">{step.number}</div>
+                            <div className="font-mono text-5xl font-bold text-border-subtle dark:text-text-primary mb-4">{step.number}</div>
 
                             {/* Icon */}
-                            <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-600">
+                            <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-subtle flex items-center justify-center text-text-muted dark:text-text-primary">
                                 <step.icon size={28} weight="duotone" />
                             </div>
 
                             {/* Title */}
-                            <h3 className="text-xl font-bold text-neutral-900 mb-2">{step.title}</h3>
+                            <h3 className="text-xl font-bold text-text-primary mb-2">{step.title}</h3>
 
                             {/* Description */}
-                            <p className="text-neutral-500 leading-relaxed">{step.description}</p>
+                            <p className="text-text-muted leading-relaxed">{step.description}</p>
                         </motion.div>
                     ))}
                 </div>

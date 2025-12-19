@@ -53,20 +53,31 @@ function App() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_800px_at_50%_200px,#3b82f61a,transparent)]"></div>
 
         <div className="max-w-4xl mx-auto text-center relative z-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="flex items-center justify-center gap-2 mb-8"
+          >
+            <img src="/logo.png" alt="How Was This Built Logo" className="w-8 h-8 object-contain" />
+            <span className="font-mono font-bold tracking-tight text-lg text-neutral-900">HOW_WAS_THIS_BUILT</span>
+          </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 text-neutral-900 leading-[1.1]"
+            className="text-5xl md:text-7xl font-sans font-bold tracking-[-0.02em] mb-6 text-neutral-900 leading-[1.15]"
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
-            Ever wondered how that site was <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">built?</span>
+            Ever wondered how that site was <span className="text-blue-600">built?</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl text-neutral-500 max-w-5xl mx-auto leading-relaxed mb-10 font-light"
+            className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto leading-[1.6] mb-10 font-normal"
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
             A web X-ray to see the tech stack, architecture, and design system<br className="hidden md:block" /> of any site, explained at your level.
           </motion.p>
@@ -93,10 +104,10 @@ function App() {
 
       {/* Trust Badges - Moved here */}
       <div className="container mx-auto px-4 mb-24">
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[10px] font-mono uppercase tracking-widest text-neutral-400">
-          <span className="flex items-center gap-2"><CheckCircle className="text-blue-500" weight="fill" /> Local Storage Only</span>
-          <span className="flex items-center gap-2"><CheckCircle className="text-blue-500" weight="fill" /> Open Source</span>
-          <span className="flex items-center gap-2"><CheckCircle className="text-blue-500" weight="fill" /> Free Forever</span>
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-base font-mono uppercase tracking-widest text-neutral-400">
+          <span className="flex items-center gap-2"><CheckCircle className="text-blue-500" weight="fill" size={18} /> Local Storage Only</span>
+          <span className="flex items-center gap-2"><CheckCircle className="text-blue-500" weight="fill" size={18} /> Open Source</span>
+          <span className="flex items-center gap-2"><CheckCircle className="text-blue-500" weight="fill" size={18} /> Free Forever</span>
         </div>
       </div>
 

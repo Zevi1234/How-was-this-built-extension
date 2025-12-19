@@ -54,8 +54,8 @@ export function SplitScreenDemo() {
                             </div>
 
                             {/* Right Sidebar: Extension - Floating Panel Style */}
-                            <div className="w-[320px] flex-shrink-0 bg-neutral-100 p-2 pl-0 z-10 flex flex-col font-sans">
-                                <div className="bg-white w-full h-full rounded-l-xl border border-neutral-200 shadow-xl flex flex-col overflow-hidden">
+                            <div className="w-[320px] flex-shrink-0 bg-neutral-100 p-3 pl-0 z-10 flex flex-col font-sans">
+                                <div className="bg-white w-full h-full rounded-l-xl border border-neutral-200 shadow-lg flex flex-col overflow-hidden">
 
                                     {/* Header */}
                                     <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200 bg-white h-[57px]">
@@ -80,10 +80,10 @@ export function SplitScreenDemo() {
                                     </div>
 
                                     {/* Analysis Content */}
-                                    <div className="flex-1 overflow-hidden p-4 bg-white">
+                                    <div className="flex-1 overflow-hidden p-3 bg-white">
 
                                         {/* TL;DR Card (Blue Box) */}
-                                        <div className="p-4 bg-[#eff6ff] rounded-lg border border-blue-100 mb-4">
+                                        <div className="p-3 bg-[#eff6ff] rounded-lg border border-blue-100 mb-3">
                                             <div className="flex items-center gap-2 mb-2">
                                                 {/* TL;DR Icon */}
                                                 <div className="w-5 h-5 bg-[#4f46e5] rounded-[4px] flex items-center justify-center">
@@ -92,44 +92,44 @@ export function SplitScreenDemo() {
                                                 <span className="font-mono text-[11px] font-bold text-[#4f46e5] uppercase tracking-wider">TL;DR <span className="text-neutral-500 font-normal normal-case tracking-normal">stripe.com</span></span>
                                             </div>
 
-                                            <p className="text-[13px] text-neutral-900 leading-snug mb-3">
+                                            <p className="text-[12px] text-neutral-900 leading-snug mb-2">
                                                 Stripe's landing page is a highly polished marketing site that uses custom JavaScript to deliver rich, animated content.
                                             </p>
 
                                             {/* Comparison Grid COMPACT */}
                                             <div className="flex justify-between items-end mb-1">
-                                                <span className="font-mono text-[10px] text-neutral-500 ml-1">Landing Page</span>
+                                                <span className="font-mono text-[9px] text-neutral-500 ml-1">Landing Page</span>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-mono text-[10px] text-neutral-500">Product</span>
-                                                    <span className="px-1 py-0.5 bg-emerald-100 text-emerald-700 text-[9px] rounded font-mono border border-emerald-200 leading-none">high</span>
+                                                    <span className="font-mono text-[9px] text-neutral-500">Product</span>
+                                                    <span className="px-1 py-0.5 bg-emerald-100 text-emerald-700 text-[8px] rounded font-mono border border-emerald-200 leading-none">high</span>
                                                 </div>
                                             </div>
 
                                             {/* Compact Technology Pills */}
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div className="space-y-1.5">
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                                <div className="space-y-1">
                                                     {/* Left Col items */}
-                                                    <div className="bg-white border border-neutral-200 rounded px-2 py-1.5 text-[10px] text-neutral-700 shadow-sm flex items-center gap-1.5">
-                                                        <img src="https://cdn.simpleicons.org/javascript/F7DF1E" className="w-3 h-3" />
+                                                    <div className="bg-white border border-neutral-200 rounded px-1.5 py-1 text-[9px] text-neutral-700 shadow-sm flex items-center gap-1">
+                                                        <img src="https://cdn.simpleicons.org/javascript/F7DF1E" className="w-2.5 h-2.5" />
                                                         Custom JS/CSS
                                                     </div>
-                                                    <div className="bg-white border border-neutral-200 rounded px-2 py-1.5 text-[10px] text-neutral-700 shadow-sm flex items-center gap-1.5">
-                                                        <img src="https://cdn.simpleicons.org/cloudflare/F38020" className="w-3 h-3" />
+                                                    <div className="bg-white border border-neutral-200 rounded px-1.5 py-1 text-[9px] text-neutral-700 shadow-sm flex items-center gap-1">
+                                                        <img src="https://cdn.simpleicons.org/cloudflare/F38020" className="w-2.5 h-2.5" />
                                                         CDN Assets
                                                     </div>
                                                 </div>
-                                                <div className="space-y-1.5">
+                                                <div className="space-y-1">
                                                     {/* Right Col items */}
-                                                    <div className="bg-blue-50/50 border border-blue-200 rounded px-2 py-1.5 text-[10px] text-blue-600 font-mono shadow-sm flex items-center gap-1.5">
-                                                        <img src="https://cdn.simpleicons.org/rubyonrails/CC0000" className="w-3 h-3" />
+                                                    <div className="bg-blue-50/50 border border-blue-200 rounded px-1.5 py-1 text-[9px] text-blue-600 font-mono shadow-sm flex items-center gap-1">
+                                                        <img src="https://cdn.simpleicons.org/rubyonrails/CC0000" className="w-2.5 h-2.5" />
                                                         Ruby on Rails
                                                     </div>
-                                                    <div className="bg-blue-50/50 border border-blue-200 rounded px-2 py-1.5 text-[10px] text-blue-600 font-mono shadow-sm flex items-center gap-1.5">
-                                                        <img src="https://cdn.simpleicons.org/go/00ADD8" className="w-3 h-3" />
+                                                    <div className="bg-blue-50/50 border border-blue-200 rounded px-1.5 py-1 text-[9px] text-blue-600 font-mono shadow-sm flex items-center gap-1">
+                                                        <img src="https://cdn.simpleicons.org/go/00ADD8" className="w-2.5 h-2.5" />
                                                         Go / Java
                                                     </div>
-                                                    <div className="bg-blue-50/50 border border-blue-200 rounded px-2 py-1.5 text-[10px] text-blue-600 font-mono shadow-sm flex items-center gap-1.5">
-                                                        <img src="https://cdn.simpleicons.org/postgresql/4169E1" className="w-3 h-3" />
+                                                    <div className="bg-blue-50/50 border border-blue-200 rounded px-1.5 py-1 text-[9px] text-blue-600 font-mono shadow-sm flex items-center gap-1">
+                                                        <img src="https://cdn.simpleicons.org/postgresql/4169E1" className="w-2.5 h-2.5" />
                                                         PostgreSQL
                                                     </div>
                                                 </div>
@@ -137,39 +137,34 @@ export function SplitScreenDemo() {
                                         </div>
 
                                         {/* Collapsed Items Section - Exact Order from Screenshot */}
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             {/* TOP LEARNINGS */}
-                                            <div className="h-[48px] bg-white border border-neutral-200 rounded-lg px-3 flex items-center justify-between shadow-sm cursor-default hover:border-neutral-300 transition-colors">
+                                            <div className="h-[42px] bg-white border border-neutral-200 rounded-lg px-3 flex items-center justify-between shadow-sm cursor-default hover:border-neutral-300 transition-colors">
                                                 <div className="flex items-center gap-2.5">
-                                                    <Fire size={16} weight="duotone" className="text-neutral-500" />
-                                                    <span className="font-bold text-[11px] text-neutral-900 uppercase tracking-wide">TOP LEARNINGS</span>
-                                                    <span className="bg-orange-100 text-orange-600 text-[9px] font-bold px-1.5 py-0.5 rounded leading-none">3</span>
+                                                    <Fire size={14} weight="duotone" className="text-neutral-500" />
+                                                    <span className="font-bold text-[10px] text-neutral-900 uppercase tracking-wide">TOP LEARNINGS</span>
+                                                    <span className="bg-orange-100 text-orange-600 text-[8px] font-bold px-1.5 py-0.5 rounded leading-none">3</span>
                                                 </div>
-                                                <CaretRight size={14} className="text-neutral-400" />
+                                                <CaretRight size={12} className="text-neutral-400" />
                                             </div>
 
                                             {/* TECH STACK */}
-                                            <div className="h-[48px] bg-white border border-neutral-200 rounded-lg px-3 flex items-center justify-between shadow-sm cursor-default hover:border-neutral-300 transition-colors">
+                                            <div className="h-[42px] bg-white border border-neutral-200 rounded-lg px-3 flex items-center justify-between shadow-sm cursor-default hover:border-neutral-300 transition-colors">
                                                 <div className="flex items-center gap-2.5">
-                                                    <Wrench size={16} weight="duotone" className="text-neutral-500" />
-                                                    <span className="font-bold text-[11px] text-neutral-900 uppercase tracking-wide">TECH STACK</span>
+                                                    <Wrench size={14} weight="duotone" className="text-neutral-500" />
+                                                    <span className="font-bold text-[10px] text-neutral-900 uppercase tracking-wide">TECH STACK</span>
                                                 </div>
-                                                <CaretRight size={14} className="text-neutral-400" />
+                                                <CaretRight size={12} className="text-neutral-400" />
                                             </div>
 
                                             {/* DESIGN SYSTEM */}
-                                            <div className="h-[48px] bg-white border border-neutral-200 rounded-lg px-3 flex items-center justify-between shadow-sm cursor-default hover:border-neutral-300 transition-colors">
+                                            <div className="h-[42px] bg-white border border-neutral-200 rounded-lg px-3 flex items-center justify-between shadow-sm cursor-default hover:border-neutral-300 transition-colors">
                                                 <div className="flex items-center gap-2.5">
-                                                    <PaintBrush size={16} weight="duotone" className="text-neutral-500" />
-                                                    <span className="font-bold text-[11px] text-neutral-900 uppercase tracking-wide">DESIGN SYSTEM</span>
+                                                    <PaintBrush size={14} weight="duotone" className="text-neutral-500" />
+                                                    <span className="font-bold text-[10px] text-neutral-900 uppercase tracking-wide">DESIGN SYSTEM</span>
                                                 </div>
-                                                <CaretRight size={14} className="text-neutral-400" />
+                                                <CaretRight size={12} className="text-neutral-400" />
                                             </div>
-                                        </div>
-
-                                        {/* Extra Visual Hint that there is more below (Fold Line) */}
-                                        <div className="mt-8 text-center opacity-30">
-                                            <div className="w-10 h-1 bg-neutral-200 mx-auto rounded-full"></div>
                                         </div>
 
                                     </div>

@@ -9,6 +9,7 @@ export default {
             fontFamily: {
                 sans: ['"JetBrains Mono"', 'Inter', 'system-ui', 'sans-serif'],
                 mono: ['"JetBrains Mono"', 'monospace'],
+                display: ['"Playfair Display"', 'serif'],
             },
             colors: {
                 background: 'var(--bg-app)',

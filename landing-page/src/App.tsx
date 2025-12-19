@@ -26,7 +26,9 @@ function App() {
           </div>
 
           <div className="flex items-center gap-4">
-            <a href="https://github.com/user/how-was-this-built"
+            <a href="https://github.com/Zevi1234/How-was-this-built-extension"
+              target="_blank"
+              rel="noopener noreferrer"
               className="p-2 text-neutral-500 hover:text-neutral-900 transition-colors">
               <GithubLogo size={20} />
             </a>
@@ -92,9 +94,14 @@ function App() {
             <button className="group w-full sm:w-auto px-8 py-4 bg-neutral-900 hover:bg-black text-white rounded-lg font-medium transition-all shadow-xl shadow-blue-500/10 flex items-center justify-center gap-2 hover:-translate-y-0.5">
               Add to Chrome <span className="text-neutral-500 group-hover:text-neutral-300 transition-colors">Free</span>
             </button>
-            <button className="w-full sm:w-auto px-8 py-4 bg-white border border-neutral-200 hover:border-neutral-300 text-neutral-700 rounded-lg font-medium transition-all flex items-center justify-center gap-2 hover:bg-neutral-50">
+            <a 
+              href="https://github.com/Zevi1234/How-was-this-built-extension"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-8 py-4 bg-white border border-neutral-200 hover:border-neutral-300 text-neutral-700 rounded-lg font-medium transition-all flex items-center justify-center gap-2 hover:bg-neutral-50"
+            >
               <GithubLogo size={20} /> Star on GitHub
-            </button>
+            </a>
           </motion.div>
         </div>
       </section>
@@ -133,7 +140,7 @@ function App() {
           </div>
 
           <div className="flex gap-4">
-            <a href="https://github.com/user/how-was-this-built" className="text-neutral-400 hover:text-neutral-900 transition-colors">
+            <a href="https://github.com/Zevi1234/How-was-this-built-extension" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-neutral-900 transition-colors">
               <GithubLogo size={24} />
             </a>
           </div>

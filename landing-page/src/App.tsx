@@ -75,7 +75,7 @@ function App() {
               className="text-5xl md:text-7xl font-sans font-bold tracking-[-0.02em] mb-6 text-text-primary leading-[1.15]"
               style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
             >
-              Ever wondered how that site was <span className="text-accent-primary">built?</span>
+              Ever wondered how that site was <span className="text-blue-600 dark:text-accent-primary">built?</span>
             </motion.h1>
 
             <motion.p

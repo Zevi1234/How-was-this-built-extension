@@ -85,6 +85,7 @@ export interface AIConfigType {
   openRouterApiKey?: string;
   selectedModel: AIModelId;
   apiKeyValidated?: boolean;
+  chatResponseLength?: number; // 256-2048 tokens, default 1024
 }
 
 // Default AI Model ID
@@ -332,6 +333,7 @@ export type AppStorageType = BaseStorageType<AppStateType> & {
   setAIConfig: (config: Partial<AIConfigType>) => Promise<void>;
   setOpenRouterApiKey: (apiKey: string, validated?: boolean) => Promise<void>;
   setSelectedModel: (modelId: AIModelId) => Promise<void>;
+  setChatResponseLength: (length: number) => Promise<void>;
   // User profile methods
   setUserBio: (bio: string) => Promise<void>;
   setLearningStyle: (learningStyle: string) => Promise<void>;

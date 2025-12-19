@@ -444,3 +444,50 @@ h4 {
 .selection-active {
   animation: selection-pulse 1.5s ease-in-out infinite;
 }
+
+/* Interactive Terms in Chat */
+.markdown-content .interactive-term {
+  display: inline;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  /* Changed from pill to rounded */
+  background: rgba(255, 92, 53, 0.1);
+  /* Factory Orange low opacity */
+  color: #FF5C35;
+  /* Factory Orange */
+  border: 1px solid rgba(255, 92, 53, 0.2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.markdown-content .interactive-term:hover {
+  background: #FF5C35;
+  color: white;
+  border-color: #FF5C35;
+}
+
+/* Follow-up Question Button */
+.followup-question {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: var(--accent-surface);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 0;
+}
+
+.followup-question:hover {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}

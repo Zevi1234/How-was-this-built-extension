@@ -34,6 +34,8 @@ export function showScanningOverlay(): () => void {
     z-index: 2147483646;
     pointer-events: none;
     overflow: hidden;
+    opacity: 1;
+    background: transparent;
   `;
 
   // Create glowing border around the viewport
@@ -41,142 +43,104 @@ export function showScanningOverlay(): () => void {
   borderGlow.style.cssText = `
     position: absolute;
     inset: 0;
-    border: 2px solid rgba(59, 130, 246, 0.6);
-    box-shadow:
-      inset 0 0 30px rgba(59, 130, 246, 0.15),
+    border: 2px solid rgba(59, 130, 246, 0.5);
+    box-shadow: 
       inset 0 0 60px rgba(59, 130, 246, 0.1),
-      0 0 20px rgba(59, 130, 246, 0.3);
-    animation: hwtb-border-pulse 1s ease-in-out infinite;
+      inset 0 0 20px rgba(59, 130, 246, 0.05);
+    opacity: 0.8;
   `;
   overlay.appendChild(borderGlow);
 
-  // Create scan line that moves down - thicker and more prominent
+  // Create scan line that moves down
   const scanLine = document.createElement('div');
   scanLine.style.cssText = `
     position: absolute;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg,
+    height: 150px;
+    background: linear-gradient(180deg, 
       transparent 0%,
-      rgba(59, 130, 246, 0.4) 15%,
-      rgba(59, 130, 246, 1) 50%,
-      rgba(59, 130, 246, 0.4) 85%,
-      transparent 100%
+      rgba(59, 130, 246, 0) 50%,
+      rgba(59, 130, 246, 0.2) 90%,
+      rgba(59, 130, 246, 0.8) 99%,
+      rgba(59, 130, 246, 1) 100%
     );
-    box-shadow:
-      0 0 30px rgba(59, 130, 246, 0.8),
-      0 0 60px rgba(59, 130, 246, 0.5),
-      0 0 100px rgba(59, 130, 246, 0.3);
-    animation: hwtb-scan-down 1.2s linear infinite;
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+    animation: hwtb-scan-down 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    will-change: transform;
+    z-index: 10;
   `;
   overlay.appendChild(scanLine);
 
-  // Create a second scan line offset for continuous effect
-  const scanLine2 = document.createElement('div');
-  scanLine2.style.cssText = `
+  // Create status text - Premium Glassmorphism
+  const statusContainer = document.createElement('div');
+  statusContainer.style.cssText = `
     position: absolute;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(59, 130, 246, 0.4) 15%,
-      rgba(59, 130, 246, 1) 50%,
-      rgba(59, 130, 246, 0.4) 85%,
-      transparent 100%
-    );
-    box-shadow:
-      0 0 30px rgba(59, 130, 246, 0.8),
-      0 0 60px rgba(59, 130, 246, 0.5),
-      0 0 100px rgba(59, 130, 246, 0.3);
-    animation: hwtb-scan-down 1.2s linear infinite;
-    animation-delay: 0.6s;
-  `;
-  overlay.appendChild(scanLine2);
-
-  // Create corner brackets - larger and more prominent
-  const corners = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-  corners.forEach(corner => {
-    const bracket = document.createElement('div');
-    const [vertical, horizontal] = corner.split('-');
-    bracket.style.cssText = `
-      position: absolute;
-      ${vertical}: 16px;
-      ${horizontal}: 16px;
-      width: 50px;
-      height: 50px;
-      border-color: rgba(59, 130, 246, 0.9);
-      border-style: solid;
-      border-width: 0;
-      border-${vertical}-width: 3px;
-      border-${horizontal}-width: 3px;
-      animation: hwtb-bracket-pulse 0.8s ease-in-out infinite;
-      filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
-    `;
-    overlay.appendChild(bracket);
-  });
-
-  // Create status text - more prominent
-  const statusText = document.createElement('div');
-  statusText.style.cssText = `
-    position: absolute;
-    bottom: 40px;
+    bottom: 48px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.9);
-    color: #fff;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
-    font-size: 14px;
+    background: rgba(10, 10, 10, 0.85);
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
     font-weight: 500;
-    letter-spacing: 0.5px;
-    box-shadow:
-      0 4px 30px rgba(0, 0, 0, 0.4),
-      0 0 20px rgba(59, 130, 246, 0.2);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(59, 130, 246, 0.4);
+    letter-spacing: 0.02em;
+    box-shadow: 
+      0 10px 30px -5px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 0 20px rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     display: flex;
     align-items: center;
     gap: 12px;
+    z-index: 20;
+    transition: transform 0.2s ease, opacity 0.2s ease;
   `;
 
-  // Add animated spinner instead of dot
-  const spinner = document.createElement('span');
+  // Add animated spinner
+  const spinner = document.createElement('div');
   spinner.style.cssText = `
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(59, 130, 246, 0.3);
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-top-color: #3b82f6;
     border-radius: 50%;
-    animation: hwtb-spin 0.8s linear infinite;
+    animation: hwtb-spin 1s linear infinite;
   `;
-  statusText.appendChild(spinner);
+  statusContainer.appendChild(spinner);
 
   const text = document.createElement('span');
-  text.textContent = 'Scanning page...';
-  statusText.appendChild(text);
+  text.textContent = 'Analysing page structure...';
+  text.style.cssText = `
+    opacity: 0.9;
+  `;
+  statusContainer.appendChild(text);
 
-  overlay.appendChild(statusText);
+  overlay.appendChild(statusContainer);
 
   // Add keyframe animations
   const style = document.createElement('style');
   style.id = 'hwtb-scanning-styles';
   style.textContent = `
     @keyframes hwtb-scan-down {
-      0% { top: -4px; opacity: 0; }
-      5% { opacity: 1; }
-      95% { opacity: 1; }
-      100% { top: 100vh; opacity: 0; }
-    }
-    @keyframes hwtb-bracket-pulse {
-      0%, 100% { opacity: 0.7; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.08); }
-    }
-    @keyframes hwtb-border-pulse {
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 1; }
+      0% { 
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% { 
+        transform: translateY(100vh);
+        opacity: 0;
+      }
     }
     @keyframes hwtb-spin {
       to { transform: rotate(360deg); }
@@ -197,10 +161,11 @@ export function showScanningOverlay(): () => void {
 
 /**
  * Hide the scanning overlay (for screenshot capture moments)
+ * Uses opacity to preserve animation state
  */
 export function hideScanningOverlay(): void {
   if (activeScanningOverlay) {
-    activeScanningOverlay.style.display = 'none';
+    activeScanningOverlay.style.opacity = '0';
   }
 }
 
@@ -209,7 +174,7 @@ export function hideScanningOverlay(): void {
  */
 export function resumeScanningOverlay(): void {
   if (activeScanningOverlay) {
-    activeScanningOverlay.style.display = 'block';
+    activeScanningOverlay.style.opacity = '1';
   }
 }
 
@@ -555,10 +520,10 @@ export function createElementPicker(): Promise<{
 
       // Ignore our own overlay elements
       if (!target ||
-          target.id === 'hwtb-element-highlight' ||
-          target === label ||
-          target === tooltip ||
-          target.closest('#hwtb-element-highlight')) {
+        target.id === 'hwtb-element-highlight' ||
+        target === label ||
+        target === tooltip ||
+        target.closest('#hwtb-element-highlight')) {
         return;
       }
 

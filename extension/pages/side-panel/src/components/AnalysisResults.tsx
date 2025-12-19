@@ -20,12 +20,14 @@ interface AnalysisResultsProps {
   onOpenChat: () => void;
 }
 
-// Get favicon URL for a given URL - uses site's own favicon to avoid third-party tracking
+// Get favicon URL using Chrome's built-in favicon API
+// This is more reliable than fetching /favicon.ico directly since many sites
+// use different paths or only declare favicons via <link> tags
 function getFaviconUrl(url: string): string {
   try {
     const urlObj = new URL(url);
-    // Use the site's own favicon directly - no third-party service needed
-    return `${urlObj.origin}/favicon.ico`;
+    // Use Chrome's _favicon API which handles all favicon formats and paths
+    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(urlObj.href)}&size=32`;
   } catch {
     return '';
   }
@@ -66,6 +68,7 @@ export function AnalysisResults({ analysis, onBack, isDark, onTagClick, onOpenCh
             isDark={isDark}
             faviconUrl={faviconUrl}
             hostname={hostname}
+            onTagClick={onTagClick}
           />
         )}
 

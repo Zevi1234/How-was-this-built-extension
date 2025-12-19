@@ -765,7 +765,8 @@ async function sendChatMessage(
   userBio?: string,
   learningStyle?: string,
   openRouterApiKey?: string,
-  selectedModel?: string
+  selectedModel?: string,
+  chatResponseLength?: number
 ): Promise<string> {
   if (!openRouterApiKey) {
     throw new Error('No API key configured. Please add your OpenRouter API key in settings.');
@@ -777,7 +778,7 @@ async function sendChatMessage(
     learningStyle,
   };
 
-  const systemPrompt = getChatSystemPrompt(userContext);
+  const systemPrompt = getChatSystemPrompt(userContext, chatResponseLength);
   const analysisContext = formatAnalysisContext(analysis);
 
   // Build the message history
@@ -803,7 +804,7 @@ async function sendChatMessage(
     apiKey: openRouterApiKey,
     model: selectedModel,
     temperature: 0.7,
-    maxTokens: 1024,
+    maxTokens: chatResponseLength || 1024,
   });
 
   return response.trim();
@@ -1036,7 +1037,8 @@ async function handleMessage(
         state.userBio,
         state.learningStyle,
         state.aiConfig?.openRouterApiKey,
-        state.aiConfig?.selectedModel
+        state.aiConfig?.selectedModel,
+        state.aiConfig?.chatResponseLength
       );
 
       // Add assistant response to chat

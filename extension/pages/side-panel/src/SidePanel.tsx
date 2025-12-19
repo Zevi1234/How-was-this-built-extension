@@ -92,11 +92,15 @@ const SidePanel = () => {
     await appState.setLearningStyle(learningStyle);
   };
 
+  const handleSetChatResponseLength = async (length: number) => {
+    await appState.setChatResponseLength(length);
+  };
+
   // Handle tag click - sends a question to AI about the tag and navigates to chat
   const handleTagClick = async (tag: string, category: string) => {
     const question = `Tell me more about "${tag}" in the context of ${category}. What is it and how is it used on this site?`;
-    await handleSendChat(question);
     setView('chat');
+    await handleSendChat(question);
   };
 
   // Show onboarding if not completed
@@ -140,6 +144,7 @@ const SidePanel = () => {
             aiConfig={appState.aiConfig}
             onSetApiKey={handleSetApiKey}
             onSetModel={handleSetModel}
+            onSetChatResponseLength={handleSetChatResponseLength}
             userBio={appState.userBio}
             learningStyle={appState.learningStyle}
             onSetBio={handleSetBio}

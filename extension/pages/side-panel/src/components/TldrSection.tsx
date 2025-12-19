@@ -1,11 +1,13 @@
 import type { TldrSection } from '@extension/storage';
 import { TechIcon } from './TechIcon';
+import { Info } from '@phosphor-icons/react';
 
 interface TldrSectionProps {
   tldr: TldrSection;
   isDark: boolean;
   faviconUrl?: string;
   hostname?: string;
+  onTagClick?: (tag: string, category: string) => void;
 }
 
 const confidenceColors = {
@@ -14,7 +16,7 @@ const confidenceColors = {
   low: { bg: 'bg-zinc-500/10', text: 'text-zinc-500', border: 'border-zinc-500/30' },
 };
 
-export function TldrSectionComponent({ tldr, isDark, faviconUrl, hostname }: TldrSectionProps) {
+export function TldrSectionComponent({ tldr, isDark, faviconUrl, hostname, onTagClick }: TldrSectionProps) {
   const confidence = confidenceColors[tldr.confidence] || confidenceColors.low;
 
   return (
@@ -55,13 +57,25 @@ export function TldrSectionComponent({ tldr, isDark, faviconUrl, hostname }: Tld
           </div>
           <div className="flex flex-wrap gap-1">
             {tldr.landingPageTech.map((tech) => (
-              <span
-                key={tech}
-                className="inline-flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]"
-              >
-                <TechIcon tech={tech} />
-                {tech}
-              </span>
+              <div key={tech} className="relative group z-10">
+                <button
+                  onClick={() => onTagClick?.(tech, 'Landing Page Tech')}
+                  className="inline-flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)] cursor-pointer transition-all duration-150 hover:border-[var(--accent-hover)] hover:shadow-sm"
+                >
+                  <TechIcon tech={tech} />
+                  {tech}
+                  <Info size={10} className="ml-1 opacity-50" />
+                </button>
+                {/* Tooltip */}
+                <div
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-mono rounded whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-neutral-800 text-white shadow-lg z-[99999]"
+                >
+                  Click to learn more
+                  <div
+                    className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-800"
+                  />
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -79,13 +93,25 @@ export function TldrSectionComponent({ tldr, isDark, faviconUrl, hostname }: Tld
           <div className="flex flex-wrap gap-1">
             {tldr.productTech.length > 0 ? (
               tldr.productTech.map((tech) => (
-                <span
-                  key={tech}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded bg-[var(--bg-card)] text-[var(--accent-primary)] border border-[var(--accent-border)]"
-                >
-                  <TechIcon tech={tech} />
-                  {tech}
-                </span>
+                <div key={tech} className="relative group z-10">
+                  <button
+                    onClick={() => onTagClick?.(tech, 'Product Tech')}
+                    className="inline-flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded bg-[var(--bg-card)] text-[var(--accent-primary)] border border-[var(--accent-border)] cursor-pointer transition-all duration-150 hover:border-[var(--accent-hover)] hover:shadow-sm"
+                  >
+                    <TechIcon tech={tech} />
+                    {tech}
+                    <Info size={10} className="ml-1 opacity-50" />
+                  </button>
+                  {/* Tooltip */}
+                  <div
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-mono rounded whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-neutral-800 text-white shadow-lg z-[99999]"
+                  >
+                    Click to learn more
+                    <div
+                      className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-800"
+                    />
+                  </div>
+                </div>
               ))
             ) : (
               <span className="text-xs italic text-[var(--text-muted)]">

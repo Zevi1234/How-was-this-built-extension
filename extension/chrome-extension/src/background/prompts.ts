@@ -107,25 +107,25 @@ export const getAnalysisPrompt = (userContext: UserContext): string => {
 {
   "tldr": {
     "summary": "A ${summaryLength} quick summary of what this site is and how it's built. Be specific about the company/product.",
-    "landingPageTech": ["tech1", "tech2", "tech3"], // 2-4 key technologies used for THIS landing page
-    "productTech": ["tech1", "tech2", "tech3"], // 2-4 likely technologies for their ACTUAL product/app (make educated guesses based on the company type, any hints in the page, or general industry patterns)
+    "landingPageTech": ["tech1", "tech2", "tech3"], // 2-4 key technologies used for THIS landing page. MAX 3 words per tag.
+    "productTech": ["tech1", "tech2", "tech3"], // 2-4 likely technologies for their ACTUAL product/app. MAX 3 words per tag.
     "confidence": "high" | "medium" | "low" // How confident are you about the product tech stack guess?
   },
   "techStack": {
     "summary": "A ${summaryLength} explanation of the technologies used on this page",
-    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "React", "Next.js", "Tailwind"
+    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "React", "Next.js", "Tailwind". MAX 3 words per tag.
   },
   "architecture": {
     "summary": "A ${summaryLength} explanation of how the site is structured",
-    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "SSR", "REST API", "SPA"
+    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "SSR", "REST API", "SPA". MAX 3 words per tag.
   },
   "designSystem": {
     "summary": "A ${summaryLength} explanation of the design approach",
-    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "Dark mode", "Custom fonts", "Minimal"
+    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "Dark mode", "Custom fonts", "Minimal". MAX 3 words per tag.
   },
   "uxPatterns": {
     "summary": "A ${summaryLength} explanation of notable UX patterns",
-    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "Skeleton loading", "Infinite scroll"
+    "tags": ["tag1", "tag2", "tag3"] // 3-6 short tags like "Skeleton loading", "Infinite scroll". MAX 3 words per tag.
   },
   "topLearnings": [
     {
@@ -144,7 +144,7 @@ export const getAnalysisPrompt = (userContext: UserContext): string => {
 Important: Return ONLY the JSON object, no markdown code blocks or additional text.`;
 };
 
-export const getChatSystemPrompt = (userContext: UserContext): string => {
+export const getChatSystemPrompt = (userContext: UserContext, responseLength?: number): string => {
   const { level: userLevel, bio, learningStyle } = userContext;
 
   const levelInstructions: Record<UserLevel, string> = {
@@ -154,12 +154,30 @@ export const getChatSystemPrompt = (userContext: UserContext): string => {
     developer: `Be technical and concise. Include specific details and trade-offs.`,
   };
 
+  // Response length instructions based on token limit
+  const lengthInstructions: Record<number, string> = {
+    256: 'Keep responses very brief and concise - just 2-3 sentences maximum. Get straight to the point.',
+    512: 'Keep responses moderate in length - around 1 short paragraph. Be concise but include key details.',
+    1024: 'Provide thorough explanations with good detail.',
+    2048: 'Provide comprehensive, in-depth explanations with examples and context where helpful.',
+  };
+
+  const effectiveLength = responseLength || 1024;
+  const lengthInstruction = lengthInstructions[effectiveLength] || lengthInstructions[1024];
+
   const learningStyleContext = getLearningStyleInstructions(learningStyle);
   const bioContext = bio ? `\n\nThe user shared this about themselves: "${bio}". Keep this in mind when answering.` : '';
 
   return `You are a helpful web development expert answering follow-up questions about a website analysis.
 
 ${levelInstructions[userLevel]}${learningStyleContext}${bioContext}
+
+**Response Length**: ${lengthInstruction}
+
+**Interactive Terms**: When mentioning technical terms, frameworks, patterns, or concepts that would be interesting to learn more about, wrap them in double brackets like [[Tailwind CSS]] or [[Virtual DOM]]. Only mark 1-3 terms per response - choose the most educational ones.
+
+**Follow-up Question**: End your response with a suggested follow-up question on a new line, formatted exactly as: >>FOLLOWUP: Your question here?
+This should be a natural next question the user might want to ask based on your response.
 
 You have context about the website that was analyzed. Answer questions based on that context. If asked about something you can't determine from the available information, say so honestly.
 

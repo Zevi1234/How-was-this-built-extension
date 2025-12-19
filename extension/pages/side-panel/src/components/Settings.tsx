@@ -22,7 +22,19 @@ import {
   Lightning,
   Coins,
   ArrowRight,
+  TextAa,
 } from '@phosphor-icons/react';
+
+const responseLengthOptions: Array<{
+  id: number;
+  label: string;
+  desc: string;
+}> = [
+    { id: 256, label: 'Concise', desc: 'Brief answers' },
+    { id: 512, label: 'Balanced', desc: 'Moderate detail' },
+    { id: 1024, label: 'Standard', desc: 'Full explanations' },
+    { id: 2048, label: 'Detailed', desc: 'In-depth responses' },
+  ];
 
 interface SettingsProps {
   currentLevel: UserLevel;
@@ -33,9 +45,11 @@ interface SettingsProps {
     openRouterApiKey?: string;
     selectedModel: AIModelId;
     apiKeyValidated?: boolean;
+    chatResponseLength?: number;
   };
   onSetApiKey?: (key: string, validated: boolean) => Promise<void>;
   onSetModel?: (modelId: AIModelId) => Promise<void>;
+  onSetChatResponseLength?: (length: number) => Promise<void>;
   userBio?: string;
   learningStyle?: string;
   onSetBio?: (bio: string) => Promise<void>;
@@ -155,6 +169,7 @@ export function Settings({
   aiConfig,
   onSetApiKey,
   onSetModel,
+  onSetChatResponseLength,
   userBio,
   learningStyle,
   onSetBio,
@@ -166,6 +181,7 @@ export function Settings({
   const [hoveredModelIndex, setHoveredModelIndex] = useState<number | null>(null);
   const [panelPosition, setPanelPosition] = useState<{ top: number; left: number } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
   // Refs
   const modelRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -254,7 +270,7 @@ export function Settings({
 
         <div className="flex gap-4 border-b border-[#333]/20">
           <button onClick={() => setActiveTab('ai')} className={`${tabBase} ${activeTab === 'ai' ? tabActive : tabInactive}`}>
-            AI_Matrix
+            AI_Settings
           </button>
           <button onClick={() => setActiveTab('personal')} className={`${tabBase} ${activeTab === 'personal' ? tabActive : tabInactive}`}>
             User_Profile
@@ -302,67 +318,128 @@ export function Settings({
               </div>
             </section>
 
-            {/* Model Selection List */}
-            <section>
-              <div className="flex items-center justify-between mb-2">
-                <span className={labelStyle}>02 // Intelligence Core</span>
-                <span className={`text-[9px] font-mono opacity-70 uppercase`}>Select active model</span>
-              </div>
+            {/* Model Selection Dropdown */}
+            <section className="relative z-10">
+              <span className={labelStyle}>02 // Intelligence Core</span>
 
-              <div className={`flex flex-col border rounded-sm overflow-hidden ${isDark ? 'border-[#333] bg-[#0e0e0e]' : 'border-neutral-200 bg-white'}`}>
-                {AI_MODELS.map((model, index) => {
-                  const isSelected = model.id === (aiConfig?.selectedModel || DEFAULT_AI_MODEL);
-                  return (
-                    <button
-                      key={model.id}
-                      ref={el => { modelRefs.current[index] = el; }}
-                      onClick={() => handleModelSelect(model.id)}
-                      onMouseEnter={() => handleModelHover(index)}
-                      onMouseLeave={() => handleModelHover(null)}
-                      className={`
-                        group relative w-full flex items-center justify-between px-3 py-2.5 text-left font-mono text-xs transition-colors
-                        border-b last:border-b-0
-                        ${isDark ? 'border-[#222]' : 'border-neutral-100'}
-                        ${isSelected
-                          ? isDark ? 'bg-[var(--accent-primary)]/10' : 'bg-[var(--accent-primary)]/5'
-                          : isDark ? 'hover:bg-[#161616]' : 'hover:bg-neutral-50'
-                        }
-                      `}
-                    >
-                      <div className="flex items-center gap-3.5">
-                        {/* Radio/Terminal Indicator */}
-                        <div className={`
-                             w-3.5 h-3.5 flex items-center justify-center border rounded-full transition-all
-                             ${isSelected
-                            ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]0'
-                            : isDark ? 'border-neutral-700' : 'border-neutral-300'
+              {/* Dropdown Trigger - Shows Selected Model */}
+              <button
+                onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
+                className={`
+                  w-full flex items-center justify-between px-3 py-3 border rounded-sm transition-all duration-200 font-mono text-xs
+                  ${isDark
+                    ? 'bg-[#1a1a1a] border-[#333] hover:border-[#555] hover:bg-[#222]'
+                    : 'bg-white border-[#e0e0e0] hover:border-[#bbb] hover:bg-[#fafafa]'
+                  }
+                  ${isModelDropdownOpen ? 'border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)]/20' : 'shadow-sm hover:shadow-md'}
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-1 rounded-sm ${isDark ? 'bg-black/40' : 'bg-gray-100'}`}>
+                    <ProviderLogo provider={selectedModel.provider} className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold leading-none mb-1 tracking-tight">{selectedModel.name}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_4px_rgba(16,185,129,0.4)]" />
+                      <span className="text-[9px] uppercase opacity-60 tracking-widest">{selectedModel.provider}</span>
+                    </div>
+                  </div>
+                </div>
+                <CaretDown
+                  size={14}
+                  className={`transition-transform duration-300 opacity-60 ${isModelDropdownOpen ? 'rotate-180 text-[var(--accent-primary)]' : ''}`}
+                />
+              </button>
+
+              {/* Dropdown Content - Expandable */}
+              <div
+                className={`
+                  mt-1.5 border rounded-sm overflow-hidden transition-all duration-300 ease-in-out
+                  ${isModelDropdownOpen ? 'opacity-100' : 'max-h-0 opacity-0 border-none'}
+                  ${isDark ? 'border-[#333] bg-[#0e0e0e]' : 'border-neutral-200 bg-white shadow-lg'}
+                `}
+              >
+                <div className="overflow-visible py-1">
+                  {AI_MODELS.map((model, index) => {
+                    const isSelected = model.id === (aiConfig?.selectedModel || DEFAULT_AI_MODEL);
+                    return (
+                      <button
+                        key={model.id}
+                        ref={el => { modelRefs.current[index] = el; }}
+                        onClick={() => {
+                          handleModelSelect(model.id);
+                          setIsModelDropdownOpen(false);
+                        }}
+                        onMouseEnter={() => handleModelHover(index)}
+                        onMouseLeave={() => handleModelHover(null)}
+                        className={`
+                          group relative w-full flex items-center justify-between px-3 py-2.5 text-left font-mono text-xs transition-colors
+                          border-l-2
+                          ${isSelected
+                            ? 'border-l-[var(--accent-primary)] bg-[var(--accent-primary)]/5'
+                            : 'border-l-transparent hover:border-l-neutral-400'
                           }
+                          ${isDark ? 'hover:bg-[#1a1a1a]' : 'hover:bg-neutral-50'}
+                        `}
+                      >
+                        <div className="flex items-center gap-3">
+                          {/* Radio Indicator */}
+                          <div className={`
+                            w-3.5 h-3.5 flex items-center justify-center border rounded-full transition-all
+                            ${isSelected
+                              ? 'border-[var(--accent-primary)] scale-110'
+                              : isDark ? 'border-neutral-700 group-hover:border-neutral-500' : 'border-neutral-300 group-hover:border-neutral-400'
+                            }
                           `}>
-                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />}
-                        </div>
+                            {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />}
+                          </div>
 
-                        <div className="flex flex-col">
-                          <span className={`leading-none mb-1 ${isSelected ? 'font-bold' : 'font-medium opacity-90'}`}>
-                            {model.name}
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            {isSelected && <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />}
-                            <span className="text-[9px] uppercase opacity-70 tracking-wider">
+                          <div className="flex flex-col">
+                            <span className={`leading-none mb-1 ${isSelected ? 'font-bold text-[var(--accent-primary)]' : 'font-medium opacity-90'}`}>
+                              {model.name}
+                            </span>
+                            <span className="text-[9px] uppercase opacity-60 tracking-wider">
                               {model.provider}
                             </span>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Provider Logo - Always visible and colored */}
-                      <div className="opacity-100">
-                        <ProviderLogo provider={model.provider} className="w-4 h-4" />
-                      </div>
+                        <ProviderLogo provider={model.provider} className={`w-3.5 h-3.5 transition-opacity ${isSelected ? 'opacity-100 text-[var(--accent-primary)]' : 'opacity-40 group-hover:opacity-80'}`} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
 
-                      {/* Active highlighter line on left */}
-                      {isSelected && (
-                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--accent-primary)]" />
-                      )}
+            {/* Response Length Section */}
+            <section>
+              <span className={labelStyle}>03 // Response Length</span>
+              <div className="grid grid-cols-2 gap-2">
+                {responseLengthOptions.map(option => {
+                  const isActive = (aiConfig?.chatResponseLength || 1024) === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => onSetChatResponseLength?.(option.id)}
+                      className={`
+                        p-3 text-left border rounded-sm transition-all duration-200
+                        ${isActive
+                          ? `border-[var(--accent-primary)] bg-[var(--accent-primary)]/5`
+                          : isDark ? 'bg-[#161616] border-[#2a2a2a] hover:border-[#444]' : 'bg-[#f4f4f4] border-[#e0e0e0] hover:border-[#ccc]'
+                        }
+                      `}
+                    >
+                      <div className={`mb-2 ${isActive ? 'text-[var(--accent-primary)]' : 'opacity-50'}`}>
+                        <TextAa size={18} weight="duotone" />
+                      </div>
+                      <div className={`font-mono text-[11px] font-bold mb-0.5 ${isActive ? 'text-[var(--accent-primary)]' : ''}`}>
+                        {option.label}
+                      </div>
+                      <div className="text-[9px] opacity-70 leading-tight">
+                        {option.desc}
+                      </div>
                     </button>
                   );
                 })}

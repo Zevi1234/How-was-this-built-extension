@@ -18,6 +18,7 @@ const storage = createStorage<AppStateType>(
       selectedModel: DEFAULT_AI_MODEL,
       openRouterApiKey: undefined,
       apiKeyValidated: false,
+      chatResponseLength: 512,
     },
   },
   {
@@ -124,6 +125,16 @@ export const appStorage: AppStorageType = {
       aiConfig: {
         ...state.aiConfig,
         selectedModel: modelId,
+      },
+    }));
+  },
+
+  setChatResponseLength: async (length: number) => {
+    await storage.set(state => ({
+      ...state,
+      aiConfig: {
+        ...state.aiConfig,
+        chatResponseLength: Math.min(2048, Math.max(256, length)),
       },
     }));
   },

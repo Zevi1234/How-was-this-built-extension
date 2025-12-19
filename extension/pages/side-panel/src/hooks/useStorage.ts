@@ -18,6 +18,7 @@ export function useAppStorage() {
     setAIConfig: appStorage.setAIConfig,
     setOpenRouterApiKey: appStorage.setOpenRouterApiKey,
     setSelectedModel: appStorage.setSelectedModel,
+    setChatResponseLength: appStorage.setChatResponseLength,
     // User profile methods
     setUserBio: appStorage.setUserBio,
     setLearningStyle: appStorage.setLearningStyle,

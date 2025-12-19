@@ -15,7 +15,7 @@ const manifest = {
   // <all_urls> is required for chrome.tabs.captureVisibleTab() to work
   // The more restrictive ['http://*/*', 'https://*/*'] doesn't grant screenshot permission
   host_permissions: ['<all_urls>'],
-  permissions: ['storage', 'scripting', 'tabs', 'activeTab', 'sidePanel'],
+  permissions: ['storage', 'scripting', 'tabs', 'activeTab', 'sidePanel', 'favicon'],
   background: {
     service_worker: 'background.js',
     type: 'module',

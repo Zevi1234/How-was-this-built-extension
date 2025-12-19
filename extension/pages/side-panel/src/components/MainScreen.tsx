@@ -18,12 +18,15 @@ interface TabInfo {
   canAnalyze: boolean;
 }
 
-// Helper to get favicon - uses site's own favicon to avoid third-party tracking
+// Helper to get favicon using Chrome's built-in favicon API
+// This is more reliable than fetching /favicon.ico directly since many sites
+// use different paths or only declare favicons via <link> tags
 function getFaviconUrl(url: string): string {
   try {
     const urlObj = new URL(url);
-    // Use the site's own favicon directly - no third-party service needed
-    return `${urlObj.origin}/favicon.ico`;
+    // Use Chrome's _favicon API which handles all favicon formats and paths
+    // Falls back gracefully if the favicon isn't cached
+    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(urlObj.href)}&size=32`;
   } catch {
     return '';
   }

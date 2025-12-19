@@ -45,10 +45,10 @@ function App() {
 
         {/* Global Vertical Grid Lines */}
         <div className="fixed inset-0 pointer-events-none z-10 flex justify-center">
-          <div className="w-full max-w-7xl mx-auto border-x border-border-subtle/30 dark:border-border-subtle/10 h-full grid grid-cols-4">
-            <div className="border-r border-dashed border-border-subtle/30 dark:border-border-subtle/10 h-full"></div>
-            <div className="border-r border-dashed border-border-subtle/30 dark:border-border-subtle/10 h-full"></div>
-            <div className="border-r border-dashed border-border-subtle/30 dark:border-border-subtle/10 h-full"></div>
+          <div className="w-full max-w-7xl mx-auto border-x border-neutral-300/20 dark:border-neutral-700/10 h-full grid grid-cols-4">
+            <div className="border-r border-dashed border-neutral-300/20 dark:border-neutral-700/8 h-full"></div>
+            <div className="border-r border-dashed border-neutral-300/20 dark:border-neutral-700/8 h-full"></div>
+            <div className="border-r border-dashed border-neutral-300/20 dark:border-neutral-700/8 h-full"></div>
           </div>
         </div>
 

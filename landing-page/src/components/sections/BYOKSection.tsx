@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { Key, ShieldCheck, CheckCircle, ArrowRight, Robot } from '@phosphor-icons/react';
+import { Key, ShieldCheck, CheckCircle, ArrowRight } from '@phosphor-icons/react';
 
 // Provider Logos
 function GoogleLogo({ className }: { className?: string }) {

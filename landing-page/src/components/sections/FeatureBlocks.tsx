@@ -112,7 +112,7 @@ export function FeatureBlocks() {
                             viewport={{ once: true }}
                             className="order-2"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center mb-6">
+                            <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center mb-6">
                                 <ChatCircleDots size={24} weight="duotone" />
                             </div>
                             <h3 className="text-3xl font-bold text-text-primary mb-4">Visual Context Chat</h3>
@@ -150,7 +150,7 @@ export function FeatureBlocks() {
                             viewport={{ once: true }}
                             className="order-2 md:order-1"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mb-6">
+                            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-6">
                                 <PaintBrush size={24} weight="duotone" />
                             </div>
                             <h3 className="text-3xl font-bold text-text-primary mb-4">Design System Extractor</h3>
@@ -313,7 +313,7 @@ export function FeatureBlocks() {
                                                 <span className="text-pink-500 font-bold text-lg">3.</span>
                                                 <span className="font-bold text-[13px] text-text-primary">Financial Trust Signals</span>
                                             </div>
-                                            <span className="text-[9px] font-mono text-pink-500 bg-pink-50 border border-pink-100 px-1 rounded uppercase">MARKETING</span>
+                                            <span className="text-[9px] font-mono text-pink-500 bg-pink-50 dark:bg-pink-900/30 border border-pink-100 dark:border-pink-800 px-1 rounded uppercase">MARKETING</span>
                                         </div>
                                         <p className="text-[11px] text-text-muted leading-relaxed pl-5">
                                             The design is extremely clean and minimalist, avoiding visual clutter. This deliberate simplicity builds trust, which is crucial when asking businesses to handle sensitive financial data.
@@ -329,7 +329,7 @@ export function FeatureBlocks() {
                             viewport={{ once: true }}
                             className="order-2"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-6">
+                            <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-6">
                                 <Lightbulb size={24} weight="duotone" />
                             </div>
                             <h3 className="text-3xl font-bold text-text-primary mb-4">Deep Learning Insights</h3>
@@ -403,22 +403,22 @@ export function FeatureBlocks() {
                                 {/* Body */}
                                 <div className="p-5 bg-card">
                                     {/* TL;DR Box */}
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                    <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <div className="w-5 h-5 bg-blue-600 rounded-[4px] flex items-center justify-center">
+                                            <div className="w-5 h-5 bg-blue-600 dark:bg-blue-500 rounded-[4px] flex items-center justify-center">
                                                 <div className="w-2.5 h-2.5 border-2 border-white rounded-[1px]"></div>
                                             </div>
-                                            <span className="font-mono text-blue-600 font-bold text-[11px] uppercase tracking-wide">TL;DR stripe.com</span>
+                                            <span className="font-mono text-blue-600 dark:text-blue-400 font-bold text-[11px] uppercase tracking-wide">TL;DR stripe.com</span>
                                         </div>
-                                        <p className="text-[13px] leading-relaxed mb-4 text-neutral-800">
+                                        <p className="text-[13px] leading-relaxed mb-4 text-neutral-800 dark:text-text-primary">
                                             Stripe's landing page is a highly polished marketing site that uses custom JavaScript to deliver rich, animated content...
                                         </p>
 
                                         <div className="grid grid-cols-2 gap-2 mt-4">
-                                            <div className="text-[10px] bg-white border border-neutral-200 rounded px-2 py-1.5 text-neutral-600">Custom JavaScript/CSS</div>
-                                            <div className="text-[10px] bg-blue-100/50 border border-blue-200 rounded px-2 py-1.5 text-blue-700 font-mono">Ruby on Rails (Core)</div>
-                                            <div className="text-[10px] bg-white border border-neutral-200 rounded px-2 py-1.5 text-neutral-600">CDN Delivery</div>
-                                            <div className="text-[10px] bg-blue-100/50 border border-blue-200 rounded px-2 py-1.5 text-blue-700 font-mono">Go/Java (Performance)</div>
+                                            <div className="text-[10px] bg-white dark:bg-card border border-neutral-200 dark:border-border-subtle rounded px-2 py-1.5 text-neutral-600 dark:text-text-secondary">Custom JavaScript/CSS</div>
+                                            <div className="text-[10px] bg-blue-100/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded px-2 py-1.5 text-blue-700 dark:text-blue-400 font-mono">Ruby on Rails (Core)</div>
+                                            <div className="text-[10px] bg-white dark:bg-card border border-neutral-200 dark:border-border-subtle rounded px-2 py-1.5 text-neutral-600 dark:text-text-secondary">CDN Delivery</div>
+                                            <div className="text-[10px] bg-blue-100/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded px-2 py-1.5 text-blue-700 dark:text-blue-400 font-mono">Go/Java (Performance)</div>
                                         </div>
                                     </div>
 

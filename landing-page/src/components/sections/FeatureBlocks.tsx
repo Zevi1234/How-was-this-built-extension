@@ -48,8 +48,8 @@ export function FeatureBlocks() {
                                     {/* User Message */}
                                     <div className="flex gap-3 justify-end items-start animate-fade-in-up">
                                         <div className="flex flex-col items-end gap-1 max-w-[85%]">
-                                            <div className="bg-accent-primary text-white rounded-xl rounded-tr-sm px-3 py-2 text-xs shadow-sm">
-                                                <p className="leading-relaxed">How is this globe animation implemented?</p>
+                                            <div className="bg-blue-600 dark:bg-accent-primary text-white rounded-xl rounded-tr-sm px-3 py-2 text-xs shadow-sm">
+                                                <p className="leading-relaxed text-white">How is this globe animation implemented?</p>
                                             </div>
                                             {/* Attachment Pill */}
                                             <div className="flex items-center gap-1.5 bg-subtle border border-border-subtle rounded-md px-2 py-1">

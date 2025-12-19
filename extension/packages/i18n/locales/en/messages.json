@@ -1,0 +1,37 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "Understand how any website is built with AI-powered analysis"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "How Was This Built?"
+  },
+  "toggleTheme": {
+    "message": "Toggle theme"
+  },
+  "analyzeButton": {
+    "message": "Analyze This Page"
+  },
+  "analyzing": {
+    "message": "Analyzing..."
+  },
+  "askQuestion": {
+    "message": "Ask a follow-up question..."
+  },
+  "displayErrorInfo": {
+    "message": "Error occurred"
+  },
+  "displayErrorDescription": {
+    "message": "Sorry, something went wrong while loading the page."
+  },
+  "displayErrorDetailsInfo": {
+    "message": "Error details:"
+  },
+  "displayErrorUnknownErrorInfo": {
+    "message": "Unknown error"
+  },
+  "displayErrorReset": {
+    "message": "Try Again"
+  }
+}

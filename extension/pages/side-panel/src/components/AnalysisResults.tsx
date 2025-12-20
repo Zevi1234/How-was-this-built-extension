@@ -3,6 +3,7 @@ import { AnalysisCard } from './AnalysisCard';
 import { DesignSystemCard } from './DesignSystemCard';
 import { TopLearningsCard } from './TopLearningsCard';
 import { TldrSectionComponent } from './TldrSection';
+import { SEOCard } from './SEOCard';
 import {
   Wrench,
   TreeStructure,
@@ -17,6 +18,7 @@ interface AnalysisResultsProps {
   onBack: () => void;
   isDark: boolean;
   onTagClick?: (tag: string, category: string) => void;
+  onIssueClick?: (issue: string, context: 'SEO' | 'AEO') => void;
   onOpenChat: () => void;
 }
 
@@ -33,7 +35,7 @@ function getFaviconUrl(url: string): string {
   }
 }
 
-export function AnalysisResults({ analysis, onBack, isDark, onTagClick, onOpenChat }: AnalysisResultsProps) {
+export function AnalysisResults({ analysis, onBack, isDark, onTagClick, onIssueClick, onOpenChat }: AnalysisResultsProps) {
   const hostname = new URL(analysis.url).hostname;
   const faviconUrl = getFaviconUrl(analysis.url);
 
@@ -81,7 +83,7 @@ export function AnalysisResults({ analysis, onBack, isDark, onTagClick, onOpenCh
           />
         )}
 
-        {/* Detailed analysis cards */}
+        {/* 3. Tech Stack */}
         <AnalysisCard
           title="Tech Stack"
           icon={<Wrench size={18} weight="duotone" />}
@@ -91,14 +93,7 @@ export function AnalysisResults({ analysis, onBack, isDark, onTagClick, onOpenCh
           onTagClick={(tag) => onTagClick?.(tag, 'Tech Stack')}
         />
 
-        <AnalysisCard
-          title="Architecture"
-          icon={<TreeStructure size={18} weight="duotone" />}
-          category={analysis.architecture}
-          isDark={isDark}
-          onTagClick={(tag) => onTagClick?.(tag, 'Architecture')}
-        />
-
+        {/* 4. Design System */}
         <DesignSystemCard
           title="Design System"
           icon={<PaintBrush size={18} weight="duotone" />}
@@ -111,6 +106,25 @@ export function AnalysisResults({ analysis, onBack, isDark, onTagClick, onOpenCh
           buttons={analysis.buttons}
         />
 
+        {/* 5. SEO/AEO */}
+        {analysis.seoAeoData && (
+          <SEOCard
+            seoAeoData={analysis.seoAeoData}
+            pageUrl={analysis.url}
+            onIssueClick={onIssueClick}
+          />
+        )}
+
+        {/* 6. Architecture */}
+        <AnalysisCard
+          title="Architecture"
+          icon={<TreeStructure size={18} weight="duotone" />}
+          category={analysis.architecture}
+          isDark={isDark}
+          onTagClick={(tag) => onTagClick?.(tag, 'Architecture')}
+        />
+
+        {/* 7. UX Patterns */}
         <AnalysisCard
           title="UX Patterns"
           icon={<Sparkle size={18} weight="duotone" />}

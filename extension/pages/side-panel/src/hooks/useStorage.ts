@@ -22,6 +22,10 @@ export function useAppStorage() {
     // User profile methods
     setUserBio: appStorage.setUserBio,
     setLearningStyle: appStorage.setLearningStyle,
+    // Slash command methods
+    addCommand: appStorage.addCommand,
+    updateCommand: appStorage.updateCommand,
+    deleteCommand: appStorage.deleteCommand,
   };
 }
 

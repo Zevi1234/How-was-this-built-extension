@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
-import type { ChatMessage, Analysis, ChatAttachment } from '@extension/storage';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import type { ChatMessage, Analysis, ChatAttachment, SlashCommand } from '@extension/storage';
 import { TypewriterText } from './TypewriterText';
 import { InteractiveMarkdownRenderer } from './InteractiveMarkdownRenderer';
 import { TypingIndicator } from './TypingIndicator';
+import { SlashCommandDropdown } from './SlashCommandDropdown';
 import {
   CaretLeft,
   PaperPlaneTilt,
@@ -10,6 +11,7 @@ import {
   Camera,
   Crosshair,
   X,
+  Terminal,
 } from '@phosphor-icons/react';
 
 /**
@@ -30,6 +32,7 @@ interface ChatViewProps {
   isLoading?: boolean;
   suggestedQuestions?: string[];
   analysis: Analysis | null;
+  customCommands?: SlashCommand[];
 }
 
 export function ChatView({
@@ -40,6 +43,7 @@ export function ChatView({
   isLoading = false,
   suggestedQuestions = [],
   analysis,
+  customCommands = [],
 }: ChatViewProps) {
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -47,67 +51,79 @@ export function ChatView({
   const [usedQuestions, setUsedQuestions] = useState<Set<string>>(new Set());
   const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
   const [isSelecting, setIsSelecting] = useState<'region' | 'element' | null>(null);
+  const [showSlashDropdown, setShowSlashDropdown] = useState(false);
+  const [slashFilter, setSlashFilter] = useState('');
+  const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
+  const [inputRect, setInputRect] = useState<DOMRect | null>(null);
+  const [runningCommand, setRunningCommand] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const prevMessagesLength = useRef(messages.length);
+
+  const filteredCommands = useMemo(() => {
+    if (!slashFilter) return customCommands;
+    const query = slashFilter.toLowerCase();
+    return customCommands.filter(cmd => cmd.name.toLowerCase().includes(query));
+  }, [customCommands, slashFilter]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Stable callback for handling chrome runtime messages
+  const handleChromeMessage = useCallback((message: { type: string; dataUrl?: string; region?: { x: number; y: number; width: number; height: number }; element?: { outerHTML: string; computedStyles: Record<string, string>; tagName: string; className: string } }) => {
+    console.log('[HWTB ChatView] Received message:', message.type);
+
+    if (message.type === 'SCREENSHOT_CAPTURED' && message.dataUrl && message.region) {
+      setAttachments(prev => [...prev, {
+        type: 'screenshot',
+        dataUrl: message.dataUrl!,
+        region: message.region!,
+        timestamp: Date.now(),
+      }]);
+      setIsSelecting(null);
+    }
+
+    if (message.type === 'ELEMENT_CAPTURED' && message.element) {
+      const styles = message.element.computedStyles;
+      setAttachments(prev => [...prev, {
+        type: 'element',
+        outerHTML: message.element!.outerHTML,
+        computedStyles: {
+          backgroundColor: styles.backgroundColor || '',
+          color: styles.color || '',
+          fontFamily: styles.fontFamily || '',
+          fontSize: styles.fontSize || '',
+          fontWeight: styles.fontWeight || '',
+          borderRadius: styles.borderRadius || '',
+          border: styles.border || '',
+          padding: styles.padding || '',
+          margin: styles.margin || '',
+          display: styles.display || '',
+          position: styles.position || '',
+        },
+        tagName: message.element!.tagName,
+        className: message.element!.className,
+        timestamp: Date.now(),
+      }]);
+      setIsSelecting(null);
+    }
+
+    if (message.type === 'SELECTION_CANCELLED' || message.type === 'SCREENSHOT_FAILED') {
+      console.log('[HWTB ChatView] Selection cancelled, resetting state');
+      setIsSelecting(null);
+    }
+  }, []);
+
   // Listen for screenshot/element capture messages from background
   useEffect(() => {
-    const handleMessage = (message: { type: string; dataUrl?: string; region?: { x: number; y: number; width: number; height: number }; element?: { outerHTML: string; computedStyles: Record<string, string>; tagName: string; className: string } }) => {
-      console.log('[HWTB ChatView] Received message:', message.type);
-
-      if (message.type === 'SCREENSHOT_CAPTURED' && message.dataUrl && message.region) {
-        setAttachments(prev => [...prev, {
-          type: 'screenshot',
-          dataUrl: message.dataUrl!,
-          region: message.region!,
-          timestamp: Date.now(),
-        }]);
-        setIsSelecting(null);
-      }
-
-      if (message.type === 'ELEMENT_CAPTURED' && message.element) {
-        const styles = message.element.computedStyles;
-        setAttachments(prev => [...prev, {
-          type: 'element',
-          outerHTML: message.element!.outerHTML,
-          computedStyles: {
-            backgroundColor: styles.backgroundColor || '',
-            color: styles.color || '',
-            fontFamily: styles.fontFamily || '',
-            fontSize: styles.fontSize || '',
-            fontWeight: styles.fontWeight || '',
-            borderRadius: styles.borderRadius || '',
-            border: styles.border || '',
-            padding: styles.padding || '',
-            margin: styles.margin || '',
-            display: styles.display || '',
-            position: styles.position || '',
-          },
-          tagName: message.element!.tagName,
-          className: message.element!.className,
-          timestamp: Date.now(),
-        }]);
-        setIsSelecting(null);
-      }
-
-      if (message.type === 'SELECTION_CANCELLED' || message.type === 'SCREENSHOT_FAILED') {
-        console.log('[HWTB ChatView] Selection cancelled, resetting state');
-        setIsSelecting(null);
-      }
-    };
-
-    chrome.runtime.onMessage.addListener(handleMessage);
+    chrome.runtime.onMessage.addListener(handleChromeMessage);
     console.log('[HWTB ChatView] Message listener registered');
     return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
+      chrome.runtime.onMessage.removeListener(handleChromeMessage);
       console.log('[HWTB ChatView] Message listener removed');
     };
-  }, []);
+  }, [handleChromeMessage]);
 
   useEffect(() => {
     scrollToBottom();
@@ -208,6 +224,21 @@ export function ChatView({
       console.error('Failed to send message:', error);
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleCommandSelect = async (command: SlashCommand) => {
+    setShowSlashDropdown(false);
+    setSlashFilter('');
+    setInput('');
+    setRunningCommand(command.name);
+
+    try {
+      await onSendMessage(command.prompt);
+    } catch (error) {
+      console.error('Failed to run command:', error);
+    } finally {
+      setRunningCommand(null);
     }
   };
 
@@ -490,13 +521,66 @@ export function ChatView({
             ref={textareaRef}
             value={input}
             onChange={(e) => {
-              setInput(e.target.value);
+              const value = e.target.value;
+              setInput(value);
+
+              // Slash command detection
+              if (value.startsWith('/') && customCommands.length > 0) {
+                const filterText = value.slice(1);
+                setSlashFilter(filterText);
+                setShowSlashDropdown(true);
+                setSelectedCommandIndex(0);
+
+                if (textareaRef.current) {
+                  setInputRect(textareaRef.current.getBoundingClientRect());
+                }
+              } else {
+                setShowSlashDropdown(false);
+                setSlashFilter('');
+              }
+
               if (textareaRef.current) {
                 textareaRef.current.style.height = 'auto';
                 textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 100)}px`;
               }
             }}
             onKeyDown={(e) => {
+              // Slash dropdown keyboard navigation
+              if (showSlashDropdown && filteredCommands.length > 0) {
+                if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setSelectedCommandIndex(prev =>
+                    prev > 0 ? prev - 1 : filteredCommands.length - 1
+                  );
+                  return;
+                }
+
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setSelectedCommandIndex(prev =>
+                    prev < filteredCommands.length - 1 ? prev + 1 : 0
+                  );
+                  return;
+                }
+
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  setShowSlashDropdown(false);
+                  setSlashFilter('');
+                  return;
+                }
+
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  const selectedCommand = filteredCommands[selectedCommandIndex];
+                  if (selectedCommand) {
+                    handleCommandSelect(selectedCommand);
+                  }
+                  return;
+                }
+              }
+
+              // Normal Enter handling
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 if ((input.trim() || attachments.length > 0) && !isSending && !isLoading && analysis) {
@@ -523,6 +607,30 @@ export function ChatView({
           >
             <PaperPlaneTilt size={16} weight="fill" />
           </button>
+
+          {/* Slash Command Dropdown */}
+          {showSlashDropdown && filteredCommands.length > 0 && (
+            <SlashCommandDropdown
+              isDark={isDark}
+              commands={filteredCommands}
+              anchorRect={inputRect}
+              selectedIndex={selectedCommandIndex}
+              onSelect={handleCommandSelect}
+              onClose={() => {
+                setShowSlashDropdown(false);
+                setSlashFilter('');
+              }}
+            />
+          )}
+
+          {/* Running Command Indicator */}
+          {runningCommand && (
+            <div className="absolute bottom-full left-3 mb-2 px-3 py-1.5 rounded-md bg-[var(--accent-primary)] text-white text-xs font-mono flex items-center gap-2 shadow-lg">
+              <Terminal size={12} weight="fill" />
+              <span>/{runningCommand} running...</span>
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            </div>
+          )}
         </div>
       </form>
     </div>

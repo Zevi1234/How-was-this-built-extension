@@ -221,6 +221,111 @@ export interface ColorPalette {
   possibleSystem?: 'tailwind' | 'shadcn' | 'radix' | 'material' | 'custom';
 }
 
+// SEO/AEO Types
+export interface SEOIssue {
+  id: string;
+  severity: 'error' | 'warning' | 'info';
+  message: string;
+  category: 'title' | 'meta' | 'headings' | 'images' | 'links' | 'content' | 'technical';
+}
+
+export interface SEOData {
+  score: number; // 0-100
+
+  title: {
+    value: string;
+    length: number;
+    isIdeal: boolean; // 50-60 chars
+  };
+
+  metaDescription: {
+    value: string;
+    length: number;
+    isIdeal: boolean; // 150-160 chars
+  };
+
+  headings: {
+    h1Count: number;
+    h2Count: number;
+    h3Count: number;
+    hasProperHierarchy: boolean;
+  };
+
+  images: {
+    total: number;
+    withoutAlt: number;
+  };
+
+  links: {
+    internal: number;
+    external: number;
+    broken: number; // Hrefs to # or javascript:void
+  };
+
+  content: {
+    wordCount: number;
+    isThinContent: boolean; // < 300 words
+  };
+
+  technical: {
+    hasCanonical: boolean;
+    canonicalUrl?: string;
+    hasViewport: boolean;
+    hasOpenGraph: boolean;
+    openGraphComplete: boolean; // og:title, og:description, og:image
+  };
+
+  topIssues: SEOIssue[];
+}
+
+export interface AEOData {
+  score: number; // 0-100 (AI-generated based on content quality)
+
+  // AI-generated insight about why this content is/isn't AI-friendly
+  insight?: string;
+
+  // Technical signals (still extracted client-side for context)
+  jsonLd: {
+    present: boolean;
+    types: string[]; // e.g., ['Article', 'FAQPage', 'Organization']
+  };
+
+  schemas: {
+    hasFAQ: boolean;
+    hasHowTo: boolean;
+    hasArticle: boolean;
+    hasProduct: boolean;
+    hasOrganization: boolean;
+    hasBreadcrumb: boolean;
+  };
+
+  freshness: {
+    hasDatePublished: boolean;
+    hasDateModified: boolean;
+    datePublished?: string;
+    dateModified?: string;
+  };
+
+  eeat: {
+    hasAuthorMarkup: boolean;
+    authorName?: string;
+    hasAboutPageLink: boolean;
+  };
+
+  qaFormat: {
+    questionHeadings: number; // Headings ending with ?
+    hasQuestionStructure: boolean; // 2+ question headings
+  };
+
+  topIssues: SEOIssue[]; // AI-generated observations
+}
+
+export interface SEOAEOData {
+  seo: SEOData;
+  aeo: AEOData;
+  extractedAt: number;
+}
+
 export interface PageData {
   url: string;
   title: string;
@@ -234,6 +339,7 @@ export interface PageData {
   extractedFonts?: ExtractedFont[]; // Fonts extracted from computed styles
   extractedButtons?: ExtractedButton[]; // Button styles extracted from DOM
   cssVariables?: Record<string, string>; // CSS custom properties from :root
+  seoAeoData?: SEOAEOData; // SEO and AEO analysis data
 }
 
 export interface AnalysisCategory {
@@ -268,6 +374,7 @@ export interface Analysis {
   fonts?: ExtractedFont[]; // Fonts extracted from DOM
   buttons?: ExtractedButton[]; // Button styles extracted from DOM
   topLearnings?: TopLearning[]; // Top 3 takeaways from the page
+  seoAeoData?: SEOAEOData; // SEO and AEO analysis data
 }
 
 // Attachment types for chat messages
@@ -307,6 +414,14 @@ export interface ChatMessage {
   attachments?: ChatAttachment[];
 }
 
+export interface SlashCommand {
+  id: string;
+  name: string;
+  prompt: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface AppStateType {
   userLevel: UserLevel;
   userBio?: string; // Optional user bio from onboarding
@@ -318,6 +433,8 @@ export interface AppStateType {
   isAnalyzing: boolean;
   // AI Configuration
   aiConfig: AIConfigType;
+  // Custom slash commands
+  customCommands: SlashCommand[];
 }
 
 export type AppStorageType = BaseStorageType<AppStateType> & {
@@ -337,4 +454,8 @@ export type AppStorageType = BaseStorageType<AppStateType> & {
   // User profile methods
   setUserBio: (bio: string) => Promise<void>;
   setLearningStyle: (learningStyle: string) => Promise<void>;
+  // Slash command methods
+  addCommand: (command: Omit<SlashCommand, 'id' | 'createdAt' | 'updatedAt'>) => Promise<SlashCommand>;
+  updateCommand: (id: string, updates: Partial<Pick<SlashCommand, 'name' | 'prompt'>>) => Promise<void>;
+  deleteCommand: (id: string) => Promise<void>;
 };

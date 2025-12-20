@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import type { UserLevel, AIModelId, AIModelInfo } from '@extension/storage';
+import type { UserLevel, AIModelId, AIModelInfo, SlashCommand } from '@extension/storage';
 import { AI_MODELS, DEFAULT_AI_MODEL } from '@extension/storage';
 import type { ReactNode } from 'react';
 import {
@@ -24,6 +24,7 @@ import {
   ArrowRight,
   TextAa,
 } from '@phosphor-icons/react';
+import { CommandLibrary } from './CommandLibrary';
 
 const responseLengthOptions: Array<{
   id: number;
@@ -54,6 +55,10 @@ interface SettingsProps {
   learningStyle?: string;
   onSetBio?: (bio: string) => Promise<void>;
   onSetLearningStyle?: (learningStyle: string) => Promise<void>;
+  customCommands?: SlashCommand[];
+  onAddCommand?: () => void;
+  onEditCommand?: (command: SlashCommand) => void;
+  onDeleteCommand?: (id: string) => Promise<void>;
 }
 
 type SettingsTab = 'ai' | 'personal';
@@ -174,6 +179,10 @@ export function Settings({
   learningStyle,
   onSetBio,
   onSetLearningStyle,
+  customCommands,
+  onAddCommand,
+  onEditCommand,
+  onDeleteCommand,
 }: SettingsProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>('ai');
   const [apiKey, setApiKey] = useState(aiConfig?.openRouterApiKey || '');
@@ -413,9 +422,20 @@ export function Settings({
               </div>
             </section>
 
+            {/* Command Library Section */}
+            {onAddCommand && onEditCommand && onDeleteCommand && (
+              <CommandLibrary
+                isDark={isDark}
+                commands={customCommands || []}
+                onAddCommand={onAddCommand}
+                onEditCommand={onEditCommand}
+                onDeleteCommand={onDeleteCommand}
+              />
+            )}
+
             {/* Response Length Section */}
             <section>
-              <span className={labelStyle}>03 // Response Length</span>
+              <span className={labelStyle}>04 // Response Length</span>
               <div className="grid grid-cols-2 gap-2">
                 {responseLengthOptions.map(option => {
                   const isActive = (aiConfig?.chatResponseLength || 1024) === option.id;

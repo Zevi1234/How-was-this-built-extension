@@ -643,6 +643,32 @@ ${JSON.stringify(visionAnalysis, null, 2)}`;
     analysis.buttons = pageData.extractedButtons;
   }
 
+  // Merge SEO/AEO data: SEO is client-side, AEO gets AI enhancement
+  if (pageData.seoAeoData) {
+    analysis.seoAeoData = pageData.seoAeoData;
+
+    // If AI provided AEO analysis, merge it with the client-side extracted signals
+    const aiAeo = (analysis as { aeoAnalysis?: { score: number; insight: string; observations: string[] } }).aeoAnalysis;
+    if (aiAeo) {
+      // Update AEO score and insight from AI
+      analysis.seoAeoData.aeo.score = aiAeo.score;
+      analysis.seoAeoData.aeo.insight = aiAeo.insight;
+
+      // Convert AI observations to SEOIssue format
+      if (aiAeo.observations && aiAeo.observations.length > 0) {
+        analysis.seoAeoData.aeo.topIssues = aiAeo.observations.map((obs: string, idx: number) => ({
+          id: `ai-aeo-${idx}`,
+          severity: 'info' as const,
+          message: obs,
+          category: 'content' as const,
+        }));
+      }
+
+      // Clean up temporary field
+      delete (analysis as { aeoAnalysis?: unknown }).aeoAnalysis;
+    }
+  }
+
   // Keep raw extracted colors for backward compatibility
   if (pageData.extractedColors && pageData.extractedColors.length > 0) {
     analysis.colorPalette = pageData.extractedColors;

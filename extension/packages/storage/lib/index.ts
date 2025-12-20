@@ -19,6 +19,11 @@ export type {
   AIModelId,
   AIModelInfo,
   AIConfigType,
+  SlashCommand,
+  SEOIssue,
+  SEOData,
+  AEOData,
+  SEOAEOData,
 } from './base/types.js';
 // Export constants
 export { DEFAULT_AI_MODEL, AI_MODELS } from './base/types.js';

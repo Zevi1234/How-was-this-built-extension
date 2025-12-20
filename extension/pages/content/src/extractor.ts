@@ -919,6 +919,455 @@ function extractCSSVariables(): Record<string, string> {
   return cssVars;
 }
 
+// ============================================================================
+// SEO/AEO Extraction (Rule-Based, Zero AI Tokens)
+// ============================================================================
+
+interface SEOIssue {
+  id: string;
+  severity: 'error' | 'warning' | 'info';
+  message: string;
+  category: 'title' | 'meta' | 'headings' | 'images' | 'links' | 'content' | 'technical';
+}
+
+interface SEOData {
+  score: number;
+  title: { value: string; length: number; isIdeal: boolean };
+  metaDescription: { value: string; length: number; isIdeal: boolean };
+  headings: { h1Count: number; h2Count: number; h3Count: number; hasProperHierarchy: boolean };
+  images: { total: number; withoutAlt: number };
+  links: { internal: number; external: number; broken: number };
+  content: { wordCount: number; isThinContent: boolean };
+  technical: { hasCanonical: boolean; canonicalUrl?: string; hasViewport: boolean; hasOpenGraph: boolean; openGraphComplete: boolean };
+  topIssues: SEOIssue[];
+}
+
+interface AEOData {
+  score: number;
+  jsonLd: { present: boolean; types: string[] };
+  schemas: { hasFAQ: boolean; hasHowTo: boolean; hasArticle: boolean; hasProduct: boolean; hasOrganization: boolean; hasBreadcrumb: boolean };
+  freshness: { hasDatePublished: boolean; hasDateModified: boolean; datePublished?: string; dateModified?: string };
+  eeat: { hasAuthorMarkup: boolean; authorName?: string; hasAboutPageLink: boolean };
+  qaFormat: { questionHeadings: number; hasQuestionStructure: boolean };
+  topIssues: SEOIssue[];
+}
+
+interface SEOAEOData {
+  seo: SEOData;
+  aeo: AEOData;
+  extractedAt: number;
+}
+
+/**
+ * Check if heading hierarchy is proper (no skipped levels)
+ */
+function checkHeadingHierarchy(): boolean {
+  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  let lastLevel = 0;
+
+  for (const h of headings) {
+    const level = parseInt(h.tagName[1]);
+    // Allow same level, going down one level, or going back up
+    if (level > lastLevel + 1 && lastLevel !== 0) {
+      return false; // Skipped a level
+    }
+    lastLevel = level;
+  }
+  return true;
+}
+
+/**
+ * Prioritize issues by severity
+ */
+function prioritizeIssues(issues: SEOIssue[]): SEOIssue[] {
+  const severityOrder = { error: 0, warning: 1, info: 2 };
+  return issues.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+}
+
+/**
+ * Calculate SEO score based on rule-based factors
+ */
+function calculateSEOScore(data: {
+  titleIsIdeal: boolean;
+  hasTitle: boolean;
+  metaDescIsIdeal: boolean;
+  hasMetaDesc: boolean;
+  h1Count: number;
+  hasProperHierarchy: boolean;
+  imagesWithoutAlt: number;
+  totalImages: number;
+  isThinContent: boolean;
+  hasCanonical: boolean;
+  hasViewport: boolean;
+  openGraphComplete: boolean;
+}): number {
+  let score = 100;
+
+  // Title: 15 points
+  if (!data.hasTitle) {
+    score -= 15;
+  } else if (!data.titleIsIdeal) {
+    score -= 8;
+  }
+
+  // Meta Description: 15 points
+  if (!data.hasMetaDesc) {
+    score -= 15;
+  } else if (!data.metaDescIsIdeal) {
+    score -= 8;
+  }
+
+  // H1: 15 points
+  if (data.h1Count === 0) {
+    score -= 15;
+  } else if (data.h1Count > 1) {
+    score -= 8;
+  }
+
+  // Heading Hierarchy: 10 points
+  if (!data.hasProperHierarchy) {
+    score -= 10;
+  }
+
+  // Images Alt: 10 points (proportional)
+  if (data.totalImages > 0) {
+    const altRatio = data.imagesWithoutAlt / data.totalImages;
+    score -= Math.round(altRatio * 10);
+  }
+
+  // Content: 10 points
+  if (data.isThinContent) {
+    score -= 10;
+  }
+
+  // Viewport: 10 points
+  if (!data.hasViewport) {
+    score -= 10;
+  }
+
+  // Canonical: 5 points
+  if (!data.hasCanonical) {
+    score -= 5;
+  }
+
+  // Open Graph: 10 points
+  if (!data.openGraphComplete) {
+    score -= 10;
+  }
+
+  return Math.max(0, Math.min(100, score));
+}
+
+// AEO score is now AI-generated in the background script
+// The client-side just extracts technical signals for context
+
+/**
+ * Extract SEO data from the current page
+ */
+function extractSEOData(): SEOData {
+  console.log('[HWTB Extractor] Starting SEO extraction...');
+  const issues: SEOIssue[] = [];
+
+  // 1. Title Analysis
+  const titleEl = document.querySelector('title');
+  const titleValue = titleEl?.textContent?.trim() || '';
+  const titleLength = titleValue.length;
+  const titleIsIdeal = titleLength >= 50 && titleLength <= 60;
+
+  if (titleLength === 0) {
+    issues.push({ id: 'no-title', severity: 'error', message: 'No page title detected', category: 'title' });
+  } else if (titleLength < 50) {
+    issues.push({ id: 'short-title', severity: 'warning', message: `Short title (${titleLength} chars, ideal: 50-60)`, category: 'title' });
+  } else if (titleLength > 60) {
+    issues.push({ id: 'long-title', severity: 'warning', message: `Long title (${titleLength} chars, may truncate in SERPs)`, category: 'title' });
+  }
+
+  // 2. Meta Description
+  const metaDesc = document.querySelector('meta[name="description"]');
+  const metaDescValue = metaDesc?.getAttribute('content')?.trim() || '';
+  const metaDescLength = metaDescValue.length;
+  const metaDescIsIdeal = metaDescLength >= 150 && metaDescLength <= 160;
+
+  if (metaDescLength === 0) {
+    issues.push({ id: 'no-meta-desc', severity: 'error', message: 'No meta description found', category: 'meta' });
+  } else if (metaDescLength < 150) {
+    issues.push({ id: 'short-meta-desc', severity: 'warning', message: `Brief meta description (${metaDescLength} chars, typical: 150-160)`, category: 'meta' });
+  } else if (metaDescLength > 160) {
+    issues.push({ id: 'long-meta-desc', severity: 'info', message: `Long meta description (${metaDescLength} chars, may truncate)`, category: 'meta' });
+  }
+
+  // 3. Headings Analysis
+  const h1s = document.querySelectorAll('h1');
+  const h2s = document.querySelectorAll('h2');
+  const h3s = document.querySelectorAll('h3');
+  const h1Count = h1s.length;
+  const h2Count = h2s.length;
+  const h3Count = h3s.length;
+  const hasProperHierarchy = checkHeadingHierarchy();
+
+  if (h1Count === 0) {
+    issues.push({ id: 'no-h1', severity: 'error', message: 'No H1 heading detected on this page', category: 'headings' });
+  } else if (h1Count > 1) {
+    issues.push({ id: 'multiple-h1', severity: 'warning', message: `Uses ${h1Count} H1 tags (typically sites use one)`, category: 'headings' });
+  }
+
+  if (!hasProperHierarchy) {
+    issues.push({ id: 'bad-hierarchy', severity: 'warning', message: 'Heading levels are skipped (e.g., H1 to H3)', category: 'headings' });
+  }
+
+  // 4. Images without alt text
+  const allImages = document.querySelectorAll('img');
+  const imagesWithoutAlt = Array.from(allImages).filter(img => {
+    const alt = img.getAttribute('alt');
+    return alt === null || alt.trim() === '';
+  });
+
+  if (imagesWithoutAlt.length > 0) {
+    issues.push({
+      id: 'missing-alt',
+      severity: 'warning',
+      message: `${imagesWithoutAlt.length} image${imagesWithoutAlt.length > 1 ? 's' : ''} without alt text`,
+      category: 'images',
+    });
+  }
+
+  // 5. Links Analysis
+  const allLinks = document.querySelectorAll('a[href]');
+  const pageOrigin = window.location.origin;
+  let internalCount = 0;
+  let externalCount = 0;
+  let brokenCount = 0;
+
+  allLinks.forEach(link => {
+    const href = link.getAttribute('href') || '';
+    if (href === '#' || href.startsWith('javascript:')) {
+      brokenCount++;
+    } else if (href.startsWith('/') || href.startsWith(pageOrigin)) {
+      internalCount++;
+    } else if (href.startsWith('http')) {
+      externalCount++;
+    }
+  });
+
+  // 6. Word Count
+  const bodyText = document.body?.innerText || '';
+  const wordCount = bodyText.split(/\s+/).filter(w => w.length > 0).length;
+  const isThinContent = wordCount < 300;
+
+  if (isThinContent) {
+    issues.push({ id: 'thin-content', severity: 'warning', message: `Light content (${wordCount} words, typical pages have 300+)`, category: 'content' });
+  }
+
+  // 7. Technical SEO
+  const canonicalEl = document.querySelector('link[rel="canonical"]');
+  const hasCanonical = canonicalEl !== null;
+  const canonicalUrl = canonicalEl?.getAttribute('href') || undefined;
+
+  const viewportEl = document.querySelector('meta[name="viewport"]');
+  const hasViewport = viewportEl !== null;
+
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  const ogDesc = document.querySelector('meta[property="og:description"]');
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  const hasOpenGraph = ogTitle !== null || ogDesc !== null || ogImage !== null;
+  const openGraphComplete = ogTitle !== null && ogDesc !== null && ogImage !== null;
+
+  if (!hasCanonical) {
+    issues.push({ id: 'no-canonical', severity: 'info', message: 'No canonical URL tag present', category: 'technical' });
+  }
+
+  if (!hasViewport) {
+    issues.push({ id: 'no-viewport', severity: 'error', message: 'No viewport meta tag (affects mobile)', category: 'technical' });
+  }
+
+  if (!openGraphComplete) {
+    issues.push({ id: 'incomplete-og', severity: 'info', message: 'Open Graph tags are partial or missing', category: 'technical' });
+  }
+
+  // Calculate Score
+  const score = calculateSEOScore({
+    titleIsIdeal,
+    hasTitle: titleLength > 0,
+    metaDescIsIdeal,
+    hasMetaDesc: metaDescLength > 0,
+    h1Count,
+    hasProperHierarchy,
+    imagesWithoutAlt: imagesWithoutAlt.length,
+    totalImages: allImages.length,
+    isThinContent,
+    hasCanonical,
+    hasViewport,
+    openGraphComplete,
+  });
+
+  console.log('[HWTB Extractor] SEO Score:', score, 'Issues:', issues.length);
+
+  return {
+    score,
+    title: { value: titleValue, length: titleLength, isIdeal: titleIsIdeal },
+    metaDescription: { value: metaDescValue, length: metaDescLength, isIdeal: metaDescIsIdeal },
+    headings: { h1Count, h2Count, h3Count, hasProperHierarchy },
+    images: { total: allImages.length, withoutAlt: imagesWithoutAlt.length },
+    links: { internal: internalCount, external: externalCount, broken: brokenCount },
+    content: { wordCount, isThinContent },
+    technical: { hasCanonical, canonicalUrl, hasViewport, hasOpenGraph, openGraphComplete },
+    topIssues: prioritizeIssues(issues).slice(0, 3),
+  };
+}
+
+/**
+ * Extract AEO (Answer Engine Optimization) technical signals from the current page
+ * Note: Score and insight are AI-generated in the background script
+ */
+function extractAEOData(): AEOData {
+  console.log('[HWTB Extractor] Starting AEO signal extraction...');
+
+  // 1. Extract JSON-LD structured data
+  const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+  const schemaTypes: string[] = [];
+
+  jsonLdScripts.forEach(script => {
+    try {
+      const data = JSON.parse(script.textContent || '{}');
+
+      // Helper to extract types from nested structures
+      const extractTypes = (obj: unknown): void => {
+        if (!obj || typeof obj !== 'object') return;
+        const item = obj as Record<string, unknown>;
+
+        if (item['@type']) {
+          const types = Array.isArray(item['@type']) ? item['@type'] : [item['@type']];
+          schemaTypes.push(...(types as string[]));
+        }
+
+        if (item['@graph'] && Array.isArray(item['@graph'])) {
+          (item['@graph'] as unknown[]).forEach(extractTypes);
+        }
+      };
+
+      extractTypes(data);
+    } catch {
+      // Invalid JSON-LD
+    }
+  });
+
+  const hasJsonLd = schemaTypes.length > 0;
+
+  // 2. Detect specific schema types
+  const hasFAQ = schemaTypes.some(t => t.includes('FAQ') || t.includes('Question'));
+  const hasHowTo = schemaTypes.some(t => t.includes('HowTo'));
+  const hasArticle = schemaTypes.some(t => t.includes('Article') || t.includes('BlogPosting') || t.includes('NewsArticle'));
+  const hasProduct = schemaTypes.some(t => t.includes('Product'));
+  const hasOrganization = schemaTypes.some(t => t.includes('Organization'));
+  const hasBreadcrumb = schemaTypes.some(t => t.includes('BreadcrumbList'));
+
+  // 3. Check for datePublished / dateModified in JSON-LD
+  let hasDatePublished = false;
+  let hasDateModified = false;
+  let datePublished: string | undefined;
+  let dateModified: string | undefined;
+
+  jsonLdScripts.forEach(script => {
+    try {
+      const data = JSON.parse(script.textContent || '{}');
+
+      const extractDates = (obj: unknown): void => {
+        if (!obj || typeof obj !== 'object') return;
+        const item = obj as Record<string, unknown>;
+
+        if (item.datePublished && typeof item.datePublished === 'string') {
+          hasDatePublished = true;
+          datePublished = item.datePublished;
+        }
+        if (item.dateModified && typeof item.dateModified === 'string') {
+          hasDateModified = true;
+          dateModified = item.dateModified;
+        }
+
+        if (item['@graph'] && Array.isArray(item['@graph'])) {
+          (item['@graph'] as unknown[]).forEach(extractDates);
+        }
+      };
+
+      extractDates(data);
+    } catch {
+      // Invalid JSON-LD
+    }
+  });
+
+  // 4. Author & E-E-A-T signals
+  let hasAuthorMarkup = false;
+  let authorName: string | undefined;
+
+  jsonLdScripts.forEach(script => {
+    try {
+      const data = JSON.parse(script.textContent || '{}');
+
+      const extractAuthor = (obj: unknown): void => {
+        if (!obj || typeof obj !== 'object') return;
+        const item = obj as Record<string, unknown>;
+
+        if (item.author) {
+          hasAuthorMarkup = true;
+          if (typeof item.author === 'string') {
+            authorName = item.author;
+          } else if (typeof item.author === 'object' && item.author !== null) {
+            const author = item.author as Record<string, unknown>;
+            if (typeof author.name === 'string') {
+              authorName = author.name;
+            }
+          }
+        }
+
+        if (item['@graph'] && Array.isArray(item['@graph'])) {
+          (item['@graph'] as unknown[]).forEach(extractAuthor);
+        }
+      };
+
+      extractAuthor(data);
+    } catch {
+      // Invalid JSON-LD
+    }
+  });
+
+  // Check for about page link
+  const hasAboutPageLink = document.querySelector('a[href*="/about"]') !== null;
+
+  // 5. Q&A format detection (questions in headings)
+  const allHeadings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  let questionHeadings = 0;
+  allHeadings.forEach(h => {
+    if (h.textContent?.trim().endsWith('?')) {
+      questionHeadings++;
+    }
+  });
+  const hasQuestionStructure = questionHeadings >= 2;
+
+  console.log('[HWTB Extractor] AEO signals extracted, schema types:', schemaTypes);
+
+  // Return technical signals - score and insight will be set by AI in background
+  return {
+    score: 0, // Placeholder - AI will set this
+    jsonLd: { present: hasJsonLd, types: schemaTypes },
+    schemas: { hasFAQ, hasHowTo, hasArticle, hasProduct, hasOrganization, hasBreadcrumb },
+    freshness: { hasDatePublished, hasDateModified, datePublished, dateModified },
+    eeat: { hasAuthorMarkup, authorName, hasAboutPageLink },
+    qaFormat: { questionHeadings, hasQuestionStructure },
+    topIssues: [], // AI will populate this
+  };
+}
+
+/**
+ * Extract combined SEO and AEO data
+ */
+function extractSEOAEOData(): SEOAEOData {
+  return {
+    seo: extractSEOData(),
+    aeo: extractAEOData(),
+    extractedAt: Date.now(),
+  };
+}
+
 /**
  * Main function to extract all page data
  */
@@ -935,5 +1384,6 @@ export function extractPageData(): PageData {
     extractedFonts: extractFonts(),
     extractedButtons: extractButtons(),
     cssVariables: extractCSSVariables(),
+    seoAeoData: extractSEOAEOData(),
   };
 }

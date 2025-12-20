@@ -2,7 +2,7 @@ import { useState } from 'react';
 import '@src/SidePanel.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { ErrorDisplay, LoadingSpinner } from '@extension/ui';
-import type { Analysis, UserLevel, ChatAttachment, AIModelId } from '@extension/storage';
+import type { Analysis, UserLevel, ChatAttachment, AIModelId, SlashCommand } from '@extension/storage';
 
 import { useAppStorage, useTheme } from './hooks/useStorage';
 import { Onboarding } from './components/Onboarding';
@@ -11,8 +11,9 @@ import { AnalysisResults } from './components/AnalysisResults';
 import { ChatView } from './components/ChatView';
 import { Header } from './components/Header';
 import { Settings } from './components/Settings';
+import { CommandEditor } from './components/CommandEditor';
 
-type View = 'main' | 'results' | 'settings' | 'chat';
+type View = 'main' | 'results' | 'settings' | 'chat' | 'command-editor';
 
 const SidePanel = () => {
   const appState = useAppStorage();
@@ -21,6 +22,7 @@ const SidePanel = () => {
 
   const [view, setView] = useState<View>('main');
   const [error, setError] = useState<string | null>(null);
+  const [editingCommand, setEditingCommand] = useState<SlashCommand | null>(null);
 
   // Handle onboarding completion
   const handleOnboardingComplete = async (profile: {
@@ -103,6 +105,37 @@ const SidePanel = () => {
     await handleSendChat(question);
   };
 
+  // Handle SEO/AEO issue click - learning-focused prompt
+  const handleIssueClick = async (issue: string, context: 'SEO' | 'AEO') => {
+    const question = `I'm learning about ${context}. This observation came up: "${issue}" - can you explain what this means and why it matters?`;
+    setView('chat');
+    await handleSendChat(question);
+  };
+
+  // Handle command operations
+  const handleAddCommand = () => {
+    setEditingCommand(null);
+    setView('command-editor');
+  };
+
+  const handleEditCommand = (command: SlashCommand) => {
+    setEditingCommand(command);
+    setView('command-editor');
+  };
+
+  const handleSaveCommand = async (data: { name: string; prompt: string }) => {
+    if (editingCommand) {
+      await appState.updateCommand(editingCommand.id, data);
+    } else {
+      await appState.addCommand(data);
+    }
+    setView('settings');
+  };
+
+  const handleDeleteCommand = async (id: string) => {
+    await appState.deleteCommand(id);
+  };
+
   // Show onboarding if not completed
   if (!appState.onboardingComplete) {
     return (
@@ -149,6 +182,19 @@ const SidePanel = () => {
             learningStyle={appState.learningStyle}
             onSetBio={handleSetBio}
             onSetLearningStyle={handleSetLearningStyle}
+            customCommands={appState.customCommands}
+            onAddCommand={handleAddCommand}
+            onEditCommand={handleEditCommand}
+            onDeleteCommand={handleDeleteCommand}
+          />
+        )}
+
+        {view === 'command-editor' && (
+          <CommandEditor
+            isDark={isDark}
+            command={editingCommand}
+            onSave={handleSaveCommand}
+            onCancel={() => setView('settings')}
           />
         )}
 
@@ -171,6 +217,7 @@ const SidePanel = () => {
             isLoading={appState.isAnalyzing}
             suggestedQuestions={appState.currentAnalysis?.suggestedQuestions}
             analysis={appState.currentAnalysis}
+            customCommands={appState.customCommands}
           />
         )}
 
@@ -180,6 +227,7 @@ const SidePanel = () => {
             onBack={() => setView('main')}
             isDark={isDark}
             onTagClick={handleTagClick}
+            onIssueClick={handleIssueClick}
             onOpenChat={() => setView('chat')}
           />
         )}

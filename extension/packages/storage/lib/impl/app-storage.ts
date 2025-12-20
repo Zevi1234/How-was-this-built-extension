@@ -1,7 +1,8 @@
 import { createStorage, StorageEnum, DEFAULT_AI_MODEL } from '../base/index.js';
-import type { AppStateType, AppStorageType, UserLevel, LearningStyle, Analysis, ChatMessage, AIConfigType, AIModelId } from '../base/index.js';
+import type { AppStateType, AppStorageType, UserLevel, LearningStyle, Analysis, ChatMessage, AIConfigType, AIModelId, SlashCommand } from '../base/index.js';
 
 const MAX_RECENT_ANALYSES = 20;
+const MAX_CUSTOM_COMMANDS = 50;
 
 const storage = createStorage<AppStateType>(
   'hwtb-app-storage',
@@ -20,6 +21,7 @@ const storage = createStorage<AppStateType>(
       apiKeyValidated: false,
       chatResponseLength: 512,
     },
+    customCommands: [],
   },
   {
     storageEnum: StorageEnum.Local,
@@ -150,6 +152,88 @@ export const appStorage: AppStorageType = {
     await storage.set(state => ({
       ...state,
       learningStyle,
+    }));
+  },
+
+  addCommand: async (commandData: Omit<SlashCommand, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const sanitizedName = commandData.name.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 20);
+
+    // Validate name is not empty after sanitization
+    if (!sanitizedName) {
+      throw new Error('Command name must contain at least one letter or number');
+    }
+
+    // Check for duplicate names and max limit
+    const currentState = await storage.get();
+    const existingCommands = currentState.customCommands || [];
+
+    if (existingCommands.some(cmd => cmd.name === sanitizedName)) {
+      throw new Error(`A command named "/${sanitizedName}" already exists`);
+    }
+
+    if (existingCommands.length >= MAX_CUSTOM_COMMANDS) {
+      throw new Error(`Maximum of ${MAX_CUSTOM_COMMANDS} commands reached`);
+    }
+
+    const now = Date.now();
+    const newCommand: SlashCommand = {
+      id: `cmd-${now}-${Math.random().toString(36).substring(2, 9)}`,
+      name: sanitizedName,
+      prompt: commandData.prompt,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await storage.set(state => ({
+      ...state,
+      customCommands: [...(state.customCommands || []), newCommand],
+    }));
+
+    return newCommand;
+  },
+
+  updateCommand: async (id: string, updates: Partial<Pick<SlashCommand, 'name' | 'prompt'>>) => {
+    const currentState = await storage.get();
+    const existingCommands = currentState.customCommands || [];
+    const commandToUpdate = existingCommands.find(cmd => cmd.id === id);
+
+    if (!commandToUpdate) {
+      throw new Error('Command not found');
+    }
+
+    // Validate and check for duplicate name if name is being updated
+    if (updates.name) {
+      const sanitizedName = updates.name.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 20);
+
+      if (!sanitizedName) {
+        throw new Error('Command name must contain at least one letter or number');
+      }
+
+      // Check if another command (not this one) has the same name
+      if (existingCommands.some(cmd => cmd.id !== id && cmd.name === sanitizedName)) {
+        throw new Error(`A command named "/${sanitizedName}" already exists`);
+      }
+    }
+
+    await storage.set(state => ({
+      ...state,
+      customCommands: (state.customCommands || []).map(cmd =>
+        cmd.id === id
+          ? {
+              ...cmd,
+              ...(updates.name && { name: updates.name.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 20) }),
+              ...(updates.prompt && { prompt: updates.prompt }),
+              updatedAt: Date.now(),
+            }
+          : cmd
+      ),
+    }));
+  },
+
+  deleteCommand: async (id: string) => {
+    await storage.set(state => ({
+      ...state,
+      customCommands: (state.customCommands || []).filter(cmd => cmd.id !== id),
     }));
   },
 };

@@ -134,6 +134,11 @@ export const getAnalysisPrompt = (userContext: UserContext): string => {
       "category": "marketing" | "strategy" | "pricing" | "competitive" | "tech" | "growth" | "other"
     }
   ], // Exactly 3 top learnings. IMPORTANT: At least ONE must have category "tech" covering an interesting technical choice or implementation detail. The other 2 can focus on: marketing angles, pricing strategy, competitive positioning, growth tactics, or anything that makes this product/company stand out
+  "aeoAnalysis": {
+    "score": 0-100, // How well would AI systems (ChatGPT, Perplexity, Google AI) understand and cite this content?
+    "insight": "1 sentence explaining why - focus on content clarity, structure, and quotability",
+    "observations": ["observation1", "observation2"] // 1-2 specific observations about AI-readiness (e.g., "Clear definitions that AI can extract", "Lacks specific data points AI could cite")
+  },
   "suggestedQuestions": [
     "Question 1?",
     "Question 2?",

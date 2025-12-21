@@ -128,9 +128,21 @@ export function SplitScreenDemo() {
                                                         <img src="https://cdn.simpleicons.org/go/00ADD8" className="w-2.5 h-2.5" />
                                                         Go / Java
                                                     </div>
-                                                    <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded px-1.5 py-1 text-[9px] text-blue-600 dark:text-blue-400 font-mono shadow-sm flex items-center gap-1">
-                                                        <img src="https://cdn.simpleicons.org/postgresql/4169E1" className="w-2.5 h-2.5" />
-                                                        PostgreSQL
+                                                    <div className="relative group">
+                                                        <div className="bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded px-1.5 py-1 text-[9px] text-blue-700 dark:text-blue-300 font-mono shadow-sm flex items-center gap-1 cursor-default">
+                                                            <img src="https://cdn.simpleicons.org/postgresql/4169E1" className="w-2.5 h-2.5" />
+                                                            PostgreSQL
+                                                        </div>
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -4 }}
+                                                            whileInView={{ opacity: 1, y: 0 }}
+                                                            viewport={{ once: true }}
+                                                            transition={{ delay: 1.5, duration: 0.4 }}
+                                                            className="absolute top-full right-0 mt-2 px-2 py-1 bg-neutral-800 text-white text-[9px] font-mono rounded shadow-lg whitespace-nowrap z-50 flex items-center justify-center pointer-events-none"
+                                                        >
+                                                            Click to learn more
+                                                            <div className="absolute bottom-full right-3 border-4 border-transparent border-b-neutral-800"></div>
+                                                        </motion.div>
                                                     </div>
                                                 </div>
                                             </div>

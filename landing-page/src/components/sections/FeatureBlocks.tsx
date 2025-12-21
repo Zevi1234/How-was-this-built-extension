@@ -68,7 +68,7 @@ export function FeatureBlocks() {
                                 {/* Header */}
                                 <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-card">
                                     <div className="flex items-center gap-2">
-                                        <button className="text-text-muted font-bold text-xs flex items-center gap-1 uppercase tracking-tight">
+                                        <button className="text-text-muted font-bold text-xs flex items-center gap-1 uppercase tracking-tight cursor-default">
                                             <ArrowLeft size={12} /> Back
                                         </button>
                                     </div>
@@ -123,17 +123,17 @@ export function FeatureBlocks() {
                                     <div className="flex items-end gap-2 rounded-xl p-2 bg-subtle border border-border-subtle">
                                         {/* Tools */}
                                         <div className="flex gap-1">
-                                            <button className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-text-secondary hover:bg-card transition-colors">
+                                            <button className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-text-secondary hover:bg-card transition-colors cursor-default">
                                                 <Camera size={16} />
                                             </button>
-                                            <button className="w-7 h-7 rounded-lg flex items-center justify-center text-accent-primary bg-accent-surface hover:brightness-95 transition-colors">
+                                            <button className="w-7 h-7 rounded-lg flex items-center justify-center text-accent-primary bg-accent-surface hover:brightness-95 transition-colors cursor-default">
                                                 <Crosshair size={16} weight="fill" />
                                             </button>
                                         </div>
                                         <div className="flex-1 pb-1.5 text-xs text-text-muted font-mono">
                                             Ask a follow up...
                                         </div>
-                                        <button className="w-7 h-7 rounded-lg bg-card border border-border-subtle text-text-muted flex items-center justify-center">
+                                        <button className="w-7 h-7 rounded-lg bg-card border border-border-subtle text-text-muted flex items-center justify-center cursor-default">
                                             <PaperPlaneTilt size={14} weight="fill" />
                                         </button>
                                     </div>
@@ -176,7 +176,7 @@ export function FeatureBlocks() {
                                                 <div className="flex-1 bg-[#0f172a]"></div>
                                             </div>
 
-                                            <button className="bg-[#0f172a] text-white px-4 py-1.5 text-sm font-medium rounded-full shadow-sm whitespace-nowrap">Button</button>
+                                            <button className="bg-[#0f172a] text-white px-4 py-1.5 text-sm font-medium rounded-full shadow-sm whitespace-nowrap cursor-default">Button</button>
                                         </div>
                                     </div>
 
@@ -221,8 +221,8 @@ export function FeatureBlocks() {
                                     <div className="border-t border-border-subtle pt-5">
                                         <span className="text-[10px] text-text-muted font-mono uppercase tracking-wider block mb-3">BUTTONS</span>
                                         <div className="flex gap-3 px-1">
-                                            <button className="bg-black text-white px-6 py-2.5 text-sm font-medium shadow-sm">Secondary</button>
-                                            <button className="bg-[#0f172a] text-white px-6 py-2.5 text-sm font-medium rounded-2xl shadow-sm">Primary</button>
+                                            <button className="bg-black text-white px-6 py-2.5 text-sm font-medium shadow-sm cursor-default">Secondary</button>
+                                            <button className="bg-[#0f172a] text-white px-6 py-2.5 text-sm font-medium rounded-2xl shadow-sm cursor-default">Primary</button>
                                         </div>
                                     </div>
                                 </div>
@@ -409,7 +409,7 @@ export function FeatureBlocks() {
                                         <div className="space-y-2">
                                             {/* Issue Items - matching extension IssueItem style */}
                                             <div className="relative group">
-                                                <div className="flex items-center gap-2 px-3 py-2 rounded bg-subtle border border-border-subtle cursor-pointer transition-all duration-150 hover:border-accent-primary/50 hover:shadow-sm">
+                                                <div className="flex items-center gap-2 px-3 py-2 rounded bg-subtle border border-border-subtle cursor-default transition-all duration-150 hover:border-accent-primary/50 hover:shadow-sm">
                                                     <WarningCircle size={14} weight="fill" className="text-red-500 flex-shrink-0" />
                                                     <span className="text-xs font-medium text-text-secondary flex-1">No meta description found</span>
                                                     <Info size={10} className="opacity-50 flex-shrink-0" />
@@ -417,7 +417,7 @@ export function FeatureBlocks() {
                                             </div>
 
                                             <div className="relative group">
-                                                <div className="flex items-center gap-2 px-3 py-2 rounded bg-subtle border border-border-subtle cursor-pointer transition-all duration-150 hover:border-accent-primary/50 hover:shadow-sm">
+                                                <div className="flex items-center gap-2 px-3 py-2 rounded bg-subtle border border-border-subtle cursor-default transition-all duration-150 hover:border-accent-primary/50 hover:shadow-sm">
                                                     <Warning size={14} weight="fill" className="text-amber-500 flex-shrink-0" />
                                                     <span className="text-xs font-medium text-text-secondary flex-1">3 images without alt text</span>
                                                     <Info size={10} className="opacity-50 flex-shrink-0" />
@@ -425,7 +425,7 @@ export function FeatureBlocks() {
                                             </div>
 
                                             <div className="relative group">
-                                                <div className="flex items-center gap-2 px-3 py-2 rounded bg-subtle border border-border-subtle cursor-pointer transition-all duration-150 hover:border-accent-primary/50 hover:shadow-sm">
+                                                <div className="flex items-center gap-2 px-3 py-2 rounded bg-subtle border border-border-subtle cursor-default transition-all duration-150 hover:border-accent-primary/50 hover:shadow-sm">
                                                     <Info size={14} weight="fill" className="text-blue-500 flex-shrink-0" />
                                                     <span className="text-xs font-medium text-text-secondary flex-1">Open Graph tags are partial</span>
                                                     <Info size={10} className="opacity-50 flex-shrink-0" />
@@ -437,13 +437,13 @@ export function FeatureBlocks() {
                                     {/* Validator Buttons */}
                                     <div className="pt-6 border-t border-border-subtle mt-6">
                                         <div className="flex gap-2 justify-between">
-                                            <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-md bg-subtle border border-border-subtle text-[10px] font-mono font-medium text-text-secondary hover:border-accent-primary hover:text-accent-primary transition-all cursor-pointer">
+                                            <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-md bg-subtle border border-border-subtle text-[10px] font-mono font-medium text-text-secondary hover:border-accent-primary hover:text-accent-primary transition-all cursor-default">
                                                 Rich Results <ArrowSquareOut size={10} className="text-text-muted" />
                                             </div>
-                                            <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-md bg-subtle border border-border-subtle text-[10px] font-mono font-medium text-text-secondary hover:border-accent-primary hover:text-accent-primary transition-all cursor-pointer">
+                                            <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-md bg-subtle border border-border-subtle text-[10px] font-mono font-medium text-text-secondary hover:border-accent-primary hover:text-accent-primary transition-all cursor-default">
                                                 PageSpeed <ArrowSquareOut size={10} className="text-text-muted" />
                                             </div>
-                                            <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-md bg-subtle border border-border-subtle text-[10px] font-mono font-medium text-text-secondary hover:border-accent-primary hover:text-accent-primary transition-all cursor-pointer">
+                                            <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-md bg-subtle border border-border-subtle text-[10px] font-mono font-medium text-text-secondary hover:border-accent-primary hover:text-accent-primary transition-all cursor-default">
                                                 Schema <ArrowSquareOut size={10} className="text-text-muted" />
                                             </div>
                                         </div>

@@ -117,7 +117,7 @@ function App() {
             transition={{ delay: 0.35 }}
             className="max-w-7xl mx-auto text-center mt-12 relative z-20"
           >
-            <p className="text-lg md:text-xl lg:text-2xl xl:text-[min(1.8vw,1.875rem)] font-mono text-text-muted/80 whitespace-nowrap tracking-tight">
+            <p className="px-4 text-base md:text-lg lg:text-xl xl:text-[min(1.5vw,1.875rem)] font-mono text-text-muted/80 whitespace-nowrap tracking-tight">
               Free forever. Local. Bring your own API key. Built by a learner for learners.
             </p>
           </motion.div>

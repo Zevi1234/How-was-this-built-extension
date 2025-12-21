@@ -57,22 +57,24 @@ function App() {
           {/* Background Grid */}
           <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,var(--border-subtle)_1px,transparent_1px),linear-gradient(to_bottom,var(--border-subtle)_1px,transparent_1px)] bg-[size:6rem_4rem] opacity-[0.4] dark:opacity-[0.1]"></div>
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_800px_at_50%_200px,var(--accent-surface),transparent)]"></div>
+          {/* Noise Texture */}
+          <div className="absolute inset-0 -z-10 opacity-[0.03] dark:opacity-[0.05] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
           <div className="max-w-4xl mx-auto text-center relative z-20">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="flex items-center justify-center gap-2 mb-8"
+              className="inline-flex items-center justify-center gap-2 mb-8 px-4 py-1.5 rounded-lg bg-subtle/50 border border-border-subtle backdrop-blur-sm"
             >
-              <img src="/logo.png" alt="How Was This Built Logo" className="w-8 h-8 object-contain" />
-              <span className="font-mono font-bold tracking-tight text-lg text-text-primary">HOW_WAS_THIS_BUILT</span>
+              <img src="/logo.png" alt="How Was This Built Logo" className="w-5 h-5 object-contain" />
+              <span className="font-mono font-bold tracking-wider text-sm text-text-primary">HOW_WAS_THIS_BUILT</span>
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-7xl font-sans font-bold tracking-[-0.02em] mb-6 text-text-primary leading-[1.15]"
+              className="text-5xl md:text-7xl font-sans font-bold tracking-tighter mb-6 text-text-primary leading-[1.1]"
               style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
             >
               Ever wondered how that site was <span className="text-blue-600 dark:text-accent-primary">built?</span>
@@ -95,8 +97,8 @@ function App() {
               transition={{ delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <button className="group w-full sm:w-auto px-8 py-4 bg-text-primary hover:opacity-90 text-background rounded-lg font-medium transition-all shadow-xl shadow-accent-primary/10 flex items-center justify-center gap-2 hover:-translate-y-0.5">
-                Add to Chrome <span className="text-text-muted group-hover:text-text-secondary transition-colors">Free</span>
+              <button className="group w-full sm:w-auto px-8 py-4 bg-text-primary hover:opacity-90 text-background rounded-lg font-medium transition-all shadow-xl shadow-accent-primary/10 flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-accent-primary/20">
+                Add to Chrome <span className="text-background/60 font-mono text-xs border border-background/20 px-1.5 py-0.5 rounded ml-1 group-hover:text-background/80 transition-colors">FREE</span>
               </button>
               <a
                 href="https://github.com/Zevi1234/How-was-this-built-extension"
@@ -108,6 +110,17 @@ function App() {
               </a>
             </motion.div>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="max-w-7xl mx-auto text-center mt-12 relative z-20"
+          >
+            <p className="text-lg md:text-xl lg:text-2xl xl:text-[min(1.8vw,1.875rem)] font-mono text-text-muted/80 whitespace-nowrap tracking-tight">
+              Free forever. Local. Bring your own API key. Built by a learner for learners.
+            </p>
+          </motion.div>
         </section>
 
         {/* Cinematic Demo */}

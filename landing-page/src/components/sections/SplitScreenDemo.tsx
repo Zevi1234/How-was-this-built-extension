@@ -3,7 +3,7 @@ import { Sun, Gear, ChatCircleDots, CaretRight, Fire, Wrench, PaintBrush, Puzzle
 
 export function SplitScreenDemo() {
     return (
-        <section className="relative py-20 overflow-hidden">
+        <section className="relative pt-8 pb-20 overflow-hidden">
             {/* Background gradient */}
             <div className="absolute inset-0 bg-gradient-to-b from-background via-subtle to-background -z-10"></div>
 

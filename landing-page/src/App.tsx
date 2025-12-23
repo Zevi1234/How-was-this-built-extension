@@ -36,9 +36,14 @@ function App() {
                 className="p-2 text-text-muted hover:text-text-primary transition-colors">
                 <GithubLogo size={20} />
               </a>
-              <button className="hidden sm:flex bg-text-primary text-background px-4 py-1.5 rounded-md text-xs font-mono font-medium hover:opacity-90 transition-opacity items-center gap-2">
+              <a
+                href="https://chromewebstore.google.com/detail/how-was-this-built/bbembbkkffgcekmiakbbcoifhkloibnp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex bg-text-primary text-background px-4 py-1.5 rounded-md text-xs font-mono font-medium hover:opacity-90 transition-opacity items-center gap-2"
+              >
                 Add to Chrome <ArrowRight weight="bold" />
-              </button>
+              </a>
             </div>
           </div>
         </nav>
@@ -97,9 +102,14 @@ function App() {
               transition={{ delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <button className="group w-full sm:w-auto px-8 py-4 bg-text-primary hover:opacity-90 text-background rounded-lg font-medium transition-all shadow-xl shadow-accent-primary/10 flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-accent-primary/20">
+              <a
+                href="https://chromewebstore.google.com/detail/how-was-this-built/bbembbkkffgcekmiakbbcoifhkloibnp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group w-full sm:w-auto px-8 py-4 bg-text-primary hover:opacity-90 text-background rounded-lg font-medium transition-all shadow-xl shadow-accent-primary/10 flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-accent-primary/20"
+              >
                 Add to Chrome <span className="text-background/60 font-mono text-xs border border-background/20 px-1.5 py-0.5 rounded ml-1 group-hover:text-background/80 transition-colors">FREE</span>
-              </button>
+              </a>
               <a
                 href="https://github.com/Zevi1234/How-was-this-built-extension"
                 target="_blank"

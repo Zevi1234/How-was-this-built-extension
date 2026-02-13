@@ -33,6 +33,7 @@ export interface OpenRouterOptions {
   maxTokens?: number;
   model?: string;
   apiKey: string; // Required - user must provide their own API key
+  signal?: AbortSignal;
 }
 
 /**
@@ -42,7 +43,7 @@ export async function callOpenRouter(
   messages: Message[],
   options: OpenRouterOptions
 ): Promise<string> {
-  const { apiKey, model, temperature = 0.7, maxTokens = 2048 } = options;
+  const { apiKey, model, temperature = 0.7, maxTokens = 2048, signal } = options;
 
   if (!apiKey) {
     throw new Error('No API key provided. Please configure your OpenRouter API key in settings.');
@@ -69,6 +70,7 @@ export async function callOpenRouter(
       temperature,
       max_tokens: maxTokens,
     }),
+    signal,
   });
 
   if (!response.ok) {

@@ -5,7 +5,6 @@ import makeManifestPlugin from './utils/plugins/make-manifest-plugin.js';
 import { watchPublicPlugin, watchRebuildPlugin } from '@extension/hmr';
 import { watchOption } from '@extension/vite-config';
 import env, { IS_DEV, IS_PROD } from '@extension/env';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 const rootDir = resolve(import.meta.dirname);
 const srcDir = resolve(rootDir, 'src');
@@ -29,7 +28,6 @@ export default defineConfig({
     watchPublicPlugin(),
     makeManifestPlugin({ outDir }),
     IS_DEV && watchRebuildPlugin({ reload: true, id: 'chrome-extension-hmr' }),
-    nodePolyfills(),
   ],
   publicDir: resolve(rootDir, 'public'),
   build: {

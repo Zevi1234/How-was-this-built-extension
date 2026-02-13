@@ -431,6 +431,7 @@ export interface AppStateType {
   currentAnalysis: Analysis | null;
   currentChat: ChatMessage[];
   isAnalyzing: boolean;
+  analysisStartedAt?: number;
   // AI Configuration
   aiConfig: AIConfigType;
   // Custom slash commands

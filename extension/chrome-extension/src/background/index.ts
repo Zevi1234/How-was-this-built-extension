@@ -8,6 +8,25 @@ import { searchProductInfo } from './search';
 
 console.log('[HWTB] Background script loaded');
 
+let analysisAbortController: AbortController | null = null;
+const ANALYSIS_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
+
+// Stale analysis recovery on startup
+(async () => {
+  try {
+    const state = await appStorage.get();
+    if (state.isAnalyzing) {
+      const staleThreshold = Date.now() - ANALYSIS_TIMEOUT_MS;
+      if (!state.analysisStartedAt || state.analysisStartedAt < staleThreshold) {
+        console.log('[HWTB] Clearing stale analysis state from previous session');
+        await appStorage.setAnalyzing(false);
+      }
+    }
+  } catch (err) {
+    console.error('[HWTB] Stale analysis recovery failed:', err);
+  }
+})();
+
 /**
  * Capture screenshot of the visible tab with retry logic
  */
@@ -373,6 +392,10 @@ interface ElementSelectedMessage {
   };
 }
 
+interface StopAnalysisMessage {
+  type: 'STOP_ANALYSIS';
+}
+
 interface SelectionCancelledMessage {
   type: 'SELECTION_CANCELLED';
 }
@@ -384,6 +407,7 @@ type BackgroundMessage =
   | StartRegionSelectionMessage
   | StartElementPickerMessage
   | CancelSelectionMessage
+  | StopAnalysisMessage
   | RegionSelectedMessage
   | ElementSelectedMessage
   | SelectionCancelledMessage;
@@ -519,7 +543,8 @@ async function analyzePageData(
   userBio?: string,
   learningStyle?: string,
   openRouterApiKey?: string,
-  selectedModel?: string
+  selectedModel?: string,
+  signal?: AbortSignal
 ): Promise<Analysis> {
   if (!openRouterApiKey) {
     throw new Error('No API key configured. Please add your OpenRouter API key in settings.');
@@ -528,6 +553,7 @@ async function analyzePageData(
   const options: OpenRouterOptions = {
     apiKey: openRouterApiKey,
     model: selectedModel,
+    signal,
   };
 
   const userContext: UserContext = {
@@ -545,6 +571,8 @@ async function analyzePageData(
   } catch (err) {
     console.warn('[HWTB] Product search failed:', err);
   }
+
+  if (signal?.aborted) throw new DOMException('Analysis cancelled', 'AbortError');
 
   const systemPrompt = getSystemPrompt(userContext, productInfo || undefined);
   const analysisPrompt = getAnalysisPrompt(userContext);
@@ -571,6 +599,8 @@ async function analyzePageData(
       console.error('[HWTB] Vision analysis failed:', visionError);
     }
   }
+
+  if (signal?.aborted) throw new DOMException('Analysis cancelled', 'AbortError');
 
   // Include vision analysis in the context if available
   let enhancedContext = pageContext;
@@ -673,6 +703,8 @@ ${JSON.stringify(visionAnalysis, null, 2)}`;
   if (pageData.extractedColors && pageData.extractedColors.length > 0) {
     analysis.colorPalette = pageData.extractedColors;
   }
+
+  if (signal?.aborted) throw new DOMException('Analysis cancelled', 'AbortError');
 
   // AI-powered color categorization
   let structuredPalette: ColorPalette | undefined;
@@ -868,6 +900,15 @@ async function handleMessage(
   sendResponse: (response: AnalysisResponse | ChatResponse | TabResponse | SimpleResponse) => void
 ) {
   try {
+    // STOP_ANALYSIS doesn't need a tab — handle it before the tab query
+    if (message.type === 'STOP_ANALYSIS') {
+      console.log('[HWTB] Stop analysis requested');
+      analysisAbortController?.abort();
+      await appStorage.setAnalyzing(false);
+      sendResponse({ success: true });
+      return;
+    }
+
     // Get current tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -972,10 +1013,21 @@ async function handleMessage(
         return;
       }
 
-      // Set analyzing state
-      await appStorage.setAnalyzing(true);
+      // Create abort controller for this analysis
+      const abortController = new AbortController();
+      analysisAbortController = abortController;
+      const { signal } = abortController;
+
+      // Set up timeout
+      const timeoutId = setTimeout(() => {
+        console.log('[HWTB] Analysis timed out after', ANALYSIS_TIMEOUT_MS / 1000, 'seconds');
+        abortController.abort();
+      }, ANALYSIS_TIMEOUT_MS);
 
       try {
+        // Set analyzing state inside try so finally always runs
+        await appStorage.setAnalyzing(true);
+
         // Get user profile from storage
         const state = await appStorage.get();
         const { userLevel, userBio, learningStyle, aiConfig } = state;
@@ -986,8 +1038,12 @@ async function handleMessage(
           selectedModel: aiConfig?.selectedModel,
         });
 
+        if (signal.aborted) throw new DOMException('Analysis cancelled', 'AbortError');
+
         // Extract page data first (need tab.id for full-page capture)
         const pageData = await extractPageData(tab.id);
+
+        if (signal.aborted) throw new DOMException('Analysis cancelled', 'AbortError');
 
         // Capture full-page screenshot (scrolls and stitches)
         const screenshot = await captureFullPageScreenshot(tab.id, tab.windowId);
@@ -998,6 +1054,8 @@ async function handleMessage(
           console.log('[HWTB] Full-page screenshot attached, size:', Math.round(screenshot.length / 1024), 'KB');
         }
 
+        if (signal.aborted) throw new DOMException('Analysis cancelled', 'AbortError');
+
         // Analyze with API
         const analysis = await analyzePageData(
           pageData,
@@ -1005,7 +1063,8 @@ async function handleMessage(
           userBio,
           learningStyle,
           aiConfig?.openRouterApiKey,
-          aiConfig?.selectedModel
+          aiConfig?.selectedModel,
+          signal
         );
 
         // Save to storage
@@ -1015,7 +1074,19 @@ async function handleMessage(
           success: true,
           analysis,
         } as AnalysisResponse);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          console.log('[HWTB] Analysis was cancelled');
+          sendResponse({
+            success: false,
+            error: 'Analysis was cancelled.',
+          } as AnalysisResponse);
+        } else {
+          throw err;
+        }
       } finally {
+        clearTimeout(timeoutId);
+        analysisAbortController = null;
         await appStorage.setAnalyzing(false);
       }
       return;

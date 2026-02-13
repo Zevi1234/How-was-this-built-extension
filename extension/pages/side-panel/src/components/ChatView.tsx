@@ -164,22 +164,36 @@ export function ChatView({
   const handleScreenshotClick = () => {
     if (isSelecting === 'region') {
       // Cancel if already in region selection mode
-      chrome.runtime.sendMessage({ type: 'CANCEL_SELECTION' });
+      chrome.runtime.sendMessage({ type: 'CANCEL_SELECTION' }, () => {
+        if (chrome.runtime.lastError) console.warn('[HWTB] Cancel selection failed:', chrome.runtime.lastError);
+      });
       setIsSelecting(null);
     } else {
       setIsSelecting('region');
-      chrome.runtime.sendMessage({ type: 'START_REGION_SELECTION' });
+      chrome.runtime.sendMessage({ type: 'START_REGION_SELECTION' }, () => {
+        if (chrome.runtime.lastError) {
+          console.warn('[HWTB] Start region selection failed:', chrome.runtime.lastError);
+          setIsSelecting(null);
+        }
+      });
     }
   };
 
   const handleElementPickerClick = () => {
     if (isSelecting === 'element') {
       // Cancel if already in element selection mode
-      chrome.runtime.sendMessage({ type: 'CANCEL_SELECTION' });
+      chrome.runtime.sendMessage({ type: 'CANCEL_SELECTION' }, () => {
+        if (chrome.runtime.lastError) console.warn('[HWTB] Cancel selection failed:', chrome.runtime.lastError);
+      });
       setIsSelecting(null);
     } else {
       setIsSelecting('element');
-      chrome.runtime.sendMessage({ type: 'START_ELEMENT_PICKER' });
+      chrome.runtime.sendMessage({ type: 'START_ELEMENT_PICKER' }, () => {
+        if (chrome.runtime.lastError) {
+          console.warn('[HWTB] Start element picker failed:', chrome.runtime.lastError);
+          setIsSelecting(null);
+        }
+      });
     }
   };
 

@@ -3,7 +3,6 @@ import { watchRebuildPlugin } from '@extension/hmr';
 import react from '@vitejs/plugin-react-swc';
 import deepmerge from 'deepmerge';
 import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import type { UserConfig } from 'vite';
 
 export const watchOption = IS_DEV
@@ -22,7 +21,7 @@ export const withPageConfig = (config: UserConfig) =>
           'process.env': env,
         },
         base: '',
-        plugins: [react(), IS_DEV && watchRebuildPlugin({ refresh: true }), nodePolyfills()],
+        plugins: [react(), IS_DEV && watchRebuildPlugin({ refresh: true })],
         build: {
           sourcemap: IS_DEV,
           minify: IS_PROD,

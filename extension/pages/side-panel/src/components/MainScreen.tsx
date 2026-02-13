@@ -6,6 +6,7 @@ import { CaretRight, MagnifyingGlass, CircleNotch } from '@phosphor-icons/react'
 
 interface MainScreenProps {
   onAnalyze: () => void;
+  onStopAnalysis: () => void;
   onViewAnalysis: (analysis: Analysis) => void;
   recentAnalyses: Analysis[];
   isAnalyzing: boolean;
@@ -34,6 +35,7 @@ function getFaviconUrl(url: string): string {
 
 export function MainScreen({
   onAnalyze,
+  onStopAnalysis,
   onViewAnalysis,
   recentAnalyses,
   isAnalyzing,
@@ -44,6 +46,7 @@ export function MainScreen({
   useEffect(() => {
     // Get current tab info
     chrome.runtime.sendMessage({ type: 'GET_CURRENT_TAB' }, (response: TabInfo) => {
+      if (chrome.runtime.lastError) return;
       if (response) {
         setCurrentTab(response);
       }
@@ -52,6 +55,7 @@ export function MainScreen({
     // Update when tab changes
     const handleTabChange = () => {
       chrome.runtime.sendMessage({ type: 'GET_CURRENT_TAB' }, (response: TabInfo) => {
+        if (chrome.runtime.lastError) return;
         if (response) {
           setCurrentTab(response);
         }
@@ -125,24 +129,25 @@ export function MainScreen({
           </div>
         )}
 
-        {/* Analyze button */}
-        <button
-          onClick={onAnalyze}
-          disabled={isAnalyzing || !currentTab?.canAnalyze}
-          className="btn-primary w-full shadow-lg hover:shadow-xl transition-all"
-        >
-          {isAnalyzing ? (
-            <>
-              <div className="spinner mr-2"></div>
-              <span>Analyzing...</span>
-            </>
-          ) : (
-            <>
-              <MagnifyingGlass size={18} weight="bold" />
-              <span>Analyze This Page</span>
-            </>
-          )}
-        </button>
+        {/* Analyze / Stop button */}
+        {isAnalyzing ? (
+          <button
+            onClick={onStopAnalysis}
+            className="btn-primary w-full shadow-lg hover:shadow-xl transition-all !bg-red-600 hover:!bg-red-700"
+          >
+            <CircleNotch size={18} weight="bold" className="animate-spin mr-2" />
+            <span>Stop Analysis</span>
+          </button>
+        ) : (
+          <button
+            onClick={onAnalyze}
+            disabled={!currentTab?.canAnalyze}
+            className="btn-primary w-full shadow-lg hover:shadow-xl transition-all"
+          >
+            <MagnifyingGlass size={18} weight="bold" />
+            <span>Analyze This Page</span>
+          </button>
+        )}
 
         {!currentTab?.canAnalyze && currentTab && !isAnalyzing && (
           <p className="text-xs font-mono mt-3 text-center text-[var(--text-muted)]">

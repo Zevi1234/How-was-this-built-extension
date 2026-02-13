@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '@src/SidePanel.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import type { Analysis, UserLevel, ChatAttachment, AIModelId, SlashCommand } from '@extension/storage';
+import { appStorage } from '@extension/storage';
 
 import { useAppStorage, useTheme } from './hooks/useStorage';
 import { Onboarding } from './components/Onboarding';
@@ -24,6 +25,25 @@ const SidePanel = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingCommand, setEditingCommand] = useState<SlashCommand | null>(null);
 
+  // Stale analysis recovery on mount
+  useEffect(() => {
+    const STALE_THRESHOLD_MS = 3 * 60 * 1000;
+    (async () => {
+      try {
+        const state = await appStorage.get();
+        if (state.isAnalyzing) {
+          const staleThreshold = Date.now() - STALE_THRESHOLD_MS;
+          if (!state.analysisStartedAt || state.analysisStartedAt < staleThreshold) {
+            console.log('[HWTB] Side panel clearing stale analysis state');
+            await appStorage.setAnalyzing(false);
+          }
+        }
+      } catch (err) {
+        console.error('[HWTB] Stale analysis check failed:', err);
+      }
+    })();
+  }, []);
+
   // Handle onboarding completion
   const handleOnboardingComplete = async (profile: {
     level: UserLevel;
@@ -44,10 +64,25 @@ const SidePanel = () => {
   const handleAnalyze = async () => {
     setError(null);
     chrome.runtime.sendMessage({ type: 'ANALYZE_PAGE' }, (response) => {
+      if (chrome.runtime.lastError) {
+        setError('Could not connect to extension. Please reload.');
+        appStorage.setAnalyzing(false);
+        return;
+      }
       if (response?.success) {
         setView('results');
       } else {
         setError(response?.error || 'Analysis failed');
+      }
+    });
+  };
+
+  // Handle stop analysis
+  const handleStopAnalysis = () => {
+    chrome.runtime.sendMessage({ type: 'STOP_ANALYSIS' }, () => {
+      if (chrome.runtime.lastError) {
+        // Service worker may be dead — force-clear locally
+        appStorage.setAnalyzing(false);
       }
     });
   };
@@ -62,6 +97,10 @@ const SidePanel = () => {
   const handleSendChat = async (message: string, attachments?: ChatAttachment[]): Promise<void> => {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({ type: 'SEND_CHAT', message, attachments }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error('Could not connect to extension. Please reload.'));
+          return;
+        }
         if (response?.success) {
           resolve();
         } else {
@@ -159,7 +198,7 @@ const SidePanel = () => {
           }`}>
           <div className="flex items-center justify-between">
             <span>// Error: {error}</span>
-            <button onClick={() => setError(null)} className="hover:opacity-70">
+            <button onClick={() => { setError(null); appStorage.setAnalyzing(false); }} className="hover:opacity-70">
               ×
             </button>
           </div>
@@ -201,6 +240,7 @@ const SidePanel = () => {
         {view === 'main' && (
           <MainScreen
             onAnalyze={handleAnalyze}
+            onStopAnalysis={handleStopAnalysis}
             onViewAnalysis={handleViewAnalysis}
             recentAnalyses={appState.recentAnalyses}
             isAnalyzing={appState.isAnalyzing}

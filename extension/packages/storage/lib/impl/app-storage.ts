@@ -97,6 +97,7 @@ export const appStorage: AppStorageType = {
     await storage.set(state => ({
       ...state,
       isAnalyzing,
+      analysisStartedAt: isAnalyzing ? Date.now() : undefined,
     }));
   },
 
